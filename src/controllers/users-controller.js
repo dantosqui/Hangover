@@ -1,4 +1,4 @@
-/*import express from "express";
+import express from "express";
 
 const router = express.Router();
 
@@ -38,4 +38,4 @@ router.delete( "/:id", (req,res) =>{// el : indica el nombre de una variable
     return res.send("Ok!");
 });
 
-export default router;*/
+export default router;

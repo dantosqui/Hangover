@@ -8,51 +8,53 @@ export class EventsService {
         //const eventInDB = eventRepository.getAllEvents(); 
     //esto queda en la BD
     //parseo: 
+    const regexFecha = /^\d{4}-\d{2}-\d{2}$/;
+    if(regexFecha.test(startDate)){
+        return false;
+    }
 
-    var queryBase = "SELECT * FROM events";
-        
+    var mensajeCondicion;
+
     if(name){
-        queryBase += ` WHERE name = ${name}`;
+        mensajeCondicion += ` WHERE name = ${name}`;
     }
 
     if(category){
-        queryBase += "INNER JOIN event_categories ON event.id_event_category = event_categories.id";
-        if(queryBase.includes("WHERE")){
-            queryBase += ` AND event_categories.category = ${category}`;
+        if(mensajeCondicion.includes("WHERE")){
+            mensajeCondicion += ` AND event_categories.category = ${category}`;
         }
         else{
-            queryBase += ` WHERE event_categories.category = ${category}`;
+            mensajeCondicion += ` WHERE event_categories.category = ${category}`;
         }
     }
 
     if (startDate){
-        if(queryBase.includes("WHERE")){
-            queryBase += ` AND startDate = ${startDate}`;
+        if(mensajeCondicion.includes("WHERE")){
+            mensajeCondicion += ` AND startDate = ${startDate}`;
         }
         else{
-            queryBase += ` WHERE startDate = ${startDate}`;
+            mensajeCondicion += ` WHERE startDate = ${startDate}`;
         }
     }
 
     if(tag){
-        queryBase += "INNER JOIN event_tags ON event_tags.id_event = event.id INNER JOIN tags ON event_tags.id_tag = tags.id";
-        if(queryBase.includes("WHERE")){
-            queryBase += ` AND tags.tag = ${tag}`;
+        if(mensajeCondicion.includes("WHERE")){
+            mensajeCondicion += ` AND tags.tag = ${tag}`;
         }
         else{
-            queryBase += ` WHERE tags.tag = ${tag}`;
+            mensajeCondicion += ` WHERE tags.tag = ${tag}`;
         }
     }
 
+    const bd = new EventRepository();
+    const resultado = bd.getEvent(mensajeCondicion, pageSize, requestedPage);
 
     return {
-        query: queryBase,
+        query: mensajeCondicion,
         pageSize: pageSize,
         page: requestedPage,
         nextPage: `http://localhost:3508/${url}?limit=${pageSize}&offset=${requestedPage+1}`
-    };
-
-    /*Client.execute(queryBase);
+    };/*
         
         return {
             collection:  [{
@@ -74,17 +76,40 @@ export class EventsService {
     }
 
     getEventById(id){
-        const query = "SELECT * FROM events e INNER JOIN event_locations el ON e.id_event_location = el.id INNER JOIN locations l ON el.id_location = l.id WHERE e.id_event = " + id;
 
-        /*Client.execute(queryBase);*/
+        const bd = new EventRepository();
+        const resultado = bd.getEventById(id);
 
         return {
-            query: query
+            resultado: resultado
         };
     }
 
     getParticipantsEvent(id, first_name, last_name, userName, attended){
-        const query = "SELECT * FROM "
+
+        if(attended || !attended) {
+            return false;
+        }
+
+        var mensajeCondicion;
+        if(first_name){
+            mensajeCondicion += ` AND u.first_name = ${first_name}`;
+        }
+        
+        if(last_name){
+            mensajeCondicion += ` AND u.last_name = ${last_name}`;
+        }
+
+        if(userName){
+            mensajeCondicion += ` AND u.username = ${userName}`;
+        }
+
+        if(attended){
+            mensajeCondicion += ` AND ee.attended = ${attended}`;
+        }
+        
+        const bd = new EventRepository();
+        const resultado = bd.getParticipantsEvent(id, mensajeCondicion);
     }
 
 }
