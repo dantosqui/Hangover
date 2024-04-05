@@ -2,33 +2,41 @@ import express from "express";
 
 const router = express.Router();
 
-router.get( "/", (request,response) =>{
+router.get( "/", (req,res) =>{
 
     const pageSize=req.query.pageSize;//recibe la orden
     const page= req.query.page;
     const allUsers = userService.getAllUsers(pageSize,page);
-    return response.json(allUsers)//devuelve una respuesta
+    return res.json(allUsers)//devuelve una respuesta
 });
 
 
-router.post( "/user/login", (req,res)=>{
+router.post("/login", (req,res)=>{
     const body = req.body;
-    console.log(body);
-    return res.status(232).send({
-        userName: body.name,
-        password: body.password,
-    }) 
-})
+    const camposValidos = ['name', 'password'];
+    const camposRecibidos = Object.keys(body);
+    if(camposValidos == camposRecibidos){
+        return res.status(232).send({
+            valido: "bien ahi"
+        });
+    }
+    else{
+        return res.status(400).send("Error en los campos");
+    }
+});
 
-router.post( "/user/register", (req,res)=>{
+router.post("/register", (req,res)=>{
     const body = req.body;
-    console.log(body);
-    return res.status(232).send({
-        firstName: body.firstName,
-        lastName: body.lastName,
-        userName: body.userName,
-        password: body.password,
-    }) 
+    const camposValidos = ['firstName', 'lastName', 'userName', 'password'];
+    const camposRecibidos = Object.keys(body);
+    if(camposValidos == camposRecibidos){
+        return res.status(232).send({
+            valido: "bien ahi"
+        });
+    }
+    else{
+        return res.status(400).send("Error en los campos");
+    }
 })
 
 router.put( "/", (req,res)=>{})
