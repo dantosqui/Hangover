@@ -45,8 +45,19 @@ export class EventRepository {
 
     async insertEnrollment(id_event, id_user){
         const existe = await client.query(("SELECT id FROM event_enrollments WHERE id_event ="+id_event+" AND id_user ="+id_user));
+        const hoy = new Date();
         if(existe == null){
-            const query = "INSERT INTO event_enrollments ([id_event],[id_user],[description],[registration_date_time],[attended],[observations],[rating]) VALUES (["+id_event+"],["+id_user+"],[";
+            const query = "INSERT INTO event_enrollments ([id_event],[id_user],[description],[registration_date_time],[attended],[observations],[rating]) VALUES (["+id_event+"],["+id_user+"],[null],["+hoy+"],[null],[null],[null])";
+            return await client.query(query);
+        }
+        return false;
+    }
+
+    async uploadUserStuff(id_event, id_user, description, attended, observations, rating){
+        const existe = await client.query(("SELECT ee.id, e.start_date FROM event_enrollments ee INNER JOIN events e ON ee.id_event = e.id_event WHERE ee.id_event ="+id_event+" AND ee.id_user ="+id_user));
+        const hoy = new Date();
+        if(existe != null && existe.start_date < hoy){
+            const query = "UPDATE event_enrollments SET description = "+description+", attended = "+attended+", observations = "+observations+", rating = "+rating+" WHERE id_event = "+id_event+" AND id_user = "+id_user;
             return await client.query(query);
         }
         return false;

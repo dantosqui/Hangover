@@ -47,14 +47,24 @@ export class EventsService {
     }
 
     const bd = new EventRepository();
-    const resultado = bd.getEvent(mensajeCondicion, pageSize, requestedPage);
-
-    return {
-        query: mensajeCondicion,
-        pageSize: pageSize,
-        page: requestedPage,
-        nextPage: `http://localhost:3508/${url}?limit=${pageSize}&offset=${requestedPage+1}`
-    };/*
+    const resultado = [
+        {
+            "hola": "como estas",
+            "soy": "un json",
+        },
+        {
+            "hola": "todo bien, vos?",
+            "soy": "un json yo tambien",
+        },
+        {
+            query: mensajeCondicion,
+            pageSize: pageSize,
+            page: requestedPage,
+            nextPage: `http://localhost:3508/${url}?limit=${pageSize}&offset=${requestedPage+1}`
+        }
+    ];//bd.getEvent(mensajeCondicion, pageSize, requestedPage);
+    return resultado;
+/*
         
         return {
             collection:  [{
@@ -145,8 +155,17 @@ export class EventsService {
 
     insertEnrollment(id_event, id_user){
         const bd = new EventsRepository();
-        const resultado = bd.insertEnrollment(id_event, id_user);
+        const resultado = bd.enrollment(id_event, id_user);
         if(resultado != null && !resultado){
+            return true;
+        }
+        return false;
+    }
+
+    uploadUserStuff(id, id_user, description, attended, observations, rating){
+        const bd = new EventsRepository();
+        const resultado = bd.uploadUserStuff(id, id_user, description, attended, observations, rating);
+        if(resultado != null){
             return true;
         }
         return false;

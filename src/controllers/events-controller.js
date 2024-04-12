@@ -104,15 +104,27 @@ router.delete( "/:id", (req,res) =>{
 
 router.post("/:id/enrollment", (req, res) => {
     const id=req.params.id;
+    const description = req.query.description;
+    const attended = req.query.attended;
+    const observations = req.query.observations;
+    const rating = req.query.rating;
     const id_user = req.body.id_user;
 
-    if(id_user){
-        if(eventService.enrollUser(id, id_user)){
+    if(id_user && description && attended && observations && rating){
+        if(eventService.uploadUserStuff(id, id_user, description, attended, observations, rating)){
             return res.status(232).send({
                 valido: "usuario inscripto correctamente"
             });
         }
     }
+    else if(id_user){
+        if(eventService.insertEnrollment(id, id_user)){
+            return res.status(232).send({
+                valido: "usuario inscripto correctamente"
+            });
+        }
+    }
+    return res.status(400).send("Error");
 });
 
 
