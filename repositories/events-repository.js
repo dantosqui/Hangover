@@ -29,4 +29,26 @@ export class EventRepository {
         return respuesta.rows;
     }
 
+    async createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
+        const query = "INSERT INTO events ([name],[description],[id_event_category],[id_event_location],[start_date],[duration_in_minutes],[price],[enabled_for_enrrolment],[max_assistance],[id_creator_user]) VALUES ([ "+name+"], ["+full_name+"], ["+latitude+"], ["+longitude+"], ["+display_order+"]),"
+    }
+
+    async updateEvent(id, keys, values){
+        const query = "UPDATE events SET "+keys+" = "+values+" WHERE id = "+id;
+        return await client.query(query);
+    }
+
+    aync deleteEvent(id){
+        const query = "DELETE FROM events WHERE id = "+id;
+        return await client.query(query);
+    }
+
+    async insertEnrollment(id_event, id_user){
+        const existe = await client.query(("SELECT id FROM event_enrollments WHERE id_event ="+id_event+" AND id_user ="+id_user));
+        if(existe == null){
+            const query = "INSERT INTO event_enrollments ([id_event],[id_user],[description],[registration_date_time],[attended],[observations],[rating]) VALUES (["+id_event+"],["+id_user+"],[";
+            return await client.query(query);
+        }
+        return false;
+    }
 }*/

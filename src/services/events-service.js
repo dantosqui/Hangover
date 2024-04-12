@@ -113,7 +113,44 @@ export class EventsService {
         }
         
         const bd = new EventRepository();
-        const resultado = bd.getParticipantsEvent(id, mensajeCondicion);
+        return bd.getParticipantsEvent(id, mensajeCondicion);
     }
+
+    createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
+        const bd = new EventRepository();
+        const resultado = bd.createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
+        if(resultado != null){
+            return true;
+        }
+        return false;
+    }
+
+    updateEvent(id, keys, values){
+        const bd = new EventsRepository();
+        const resultado = bd.updateProvince(id, keys, values);
+        if(resultado != null){
+            return true;
+        }
+        return false;
+    }
+
+    deleteProvincia(id){
+        const bd = new EventsRepository();
+        const resultado = bd.deleteEvent(id);
+        if(resultado){
+            return true;
+        }
+        return false;
+    }
+
+    insertEnrollment(id_event, id_user){
+        const bd = new EventsRepository();
+        const resultado = bd.insertEnrollment(id_event, id_user);
+        if(resultado != null && !resultado){
+            return true;
+        }
+        return false;
+    }
+
 
 }

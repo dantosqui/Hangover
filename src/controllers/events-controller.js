@@ -45,16 +45,75 @@ router.get("/:id/enrollment", (req, res) => {
     const rating = req.query.rating;
 
     try {
-        const event = eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
-        if(!event){
+        const participants = eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
+        if(participants){
             return res.status(400).json({ error: 'El formato de attended es inválido' });
         }
-        return res.json(event);
+        return res.json(participants);
     }
     catch(error){
         console.log("Error al buscar");
         return res.json("Un Error");
     }
 });
+
+router.post("/", (req, res) => {
+    const name = req.body.name;
+    const description = req.body.description;
+    const id_event_category = req.body.id_event_category;
+    const id_event_location = req.body.id_event_location;
+    const start_date = req.body.start_date;
+    const duration_in_minutes = req.body.duration_in_minutes;
+    const price = req.body.price;
+    const enabled_for_enrollment = req.body.enabled_for_enrollment;
+    const max_assistance = req.body.max_assistance;
+    const id_creator_user = req.body.id_creator_user;
+    
+    if(name && description && id_event_category && id_event_location && start_date && duration_in_minutes && price && enabled_for_enrollment && max_assistance && id_creator_user){
+        if(eventService.createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user)){
+            return res.status(232).send({
+                valido: "evento creado correctamente",
+            });
+        }
+    }
+    return res.status(400).send("Error en los campos");
+});
+
+router.patch( "/:id", (req,res) =>{
+    const id=req.params.id;
+    const body = req.body;
+    if(Object.keys(body) && Object.values(body)){
+        if(eventService.updateEvent(id, Object.keys(body), Object.values(body))){
+            return res.status(232).send({
+                valido: "evento actualizado correctamente"
+            });
+        }
+    }
+    return res.status(400).send("Error en los campos");
+});
+
+router.delete( "/:id", (req,res) =>{
+    const id=req.params.id;
+    if(eventService.deleteEvent(id)){
+        return res.status(232).send({
+            valido: "evento eliminado correctamente"
+        });
+    }
+    return res.status(400).send("Error en los campos");
+});
+
+router.post("/:id/enrollment", (req, res) => {
+    const id=req.params.id;
+    const id_user = req.body.id_user;
+
+    if(id_user){
+        if(eventService.enrollUser(id, id_user)){
+            return res.status(232).send({
+                valido: "usuario inscripto correctamente"
+            });
+        }
+    }
+});
+
 
 export default router;

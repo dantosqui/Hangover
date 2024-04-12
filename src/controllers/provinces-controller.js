@@ -12,19 +12,13 @@ router.post("/", (req,res)=>{
     const display_order = req.body.display_order;
 
     if(name && full_name && latitude && longitude && display_order){
-        const creacion = provinceService.createProvince(name, full_name, latitude, longitude, display_order);
-        if(creacion){
+        if(provinceService.createProvince(name, full_name, latitude, longitude, display_order)){
             return res.status(232).send({
-                valido: "provincia creada correctamente"
+                valido: "provincia creada correctamente",
             });
         }
-        else{
-            return res.status(400).send("Error en los campos");
-        }
     }
-    else{
-        return res.status(400).send("Error en los campos");
-    }
+    return res.status(400).send("Error en los campos");
 });
 
 
@@ -32,10 +26,9 @@ router.patch( "/:id", (req,res) =>{
     const id=req.params.id;
     const body = req.body;
     if(Object.keys(body) && Object.values(body)){
-        const actualizacion = provinceService.actualizarProvince(id, Object.keys(body), Object.values(body));   
-        if(actualizacion){
+        if(provinceService.updateProvince(id, Object.keys(body), Object.values(body))){
             return res.status(232).send({
-                valido: "provincia eliminada correctamente"
+                valido: "provincia actualizada correctamente",
             });
         }
     }
@@ -43,12 +36,34 @@ router.patch( "/:id", (req,res) =>{
 });
 
 router.delete( "/:id", (req,res) =>{
-    const id=req.params.id;
-    const eliminacion = provinceService.deleteProvince(id);
-    if(eliminacion){
+    if(provinceService.deleteProvince(req.params.id)){
         return res.status(232).send({
             valido: "provincia eliminada correctamente"
         });
     }
     return res.status(400).send("Error en los campos");
 });
+
+router.get("/", (req, res) => {
+    const pageSize = req.query.pageSize;
+    const page = req.query.page;
+
+    try{
+        return res.json(provinceService.getAllProvinces(page, pageSize, req.url));
+    }catch(error){ 
+        return res.json("Un Error");
+    }
+});
+
+router.get("/:id", (req, res) => {
+    try {
+        const province = provinceService.getProvinceById(req.params.id);
+        return res.json(province);
+    }
+    catch(error){
+        console.log("Error al buscar");
+        return res.json("Un Error");
+    }
+});
+
+export default router;
