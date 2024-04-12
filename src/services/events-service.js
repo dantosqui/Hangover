@@ -46,7 +46,7 @@ export class EventsService {
         }
     }
 
-    const bd = new EventRepository();
+    //const bd = new EventRepository();
     const resultado = [
         {
             "hola": "como estas",

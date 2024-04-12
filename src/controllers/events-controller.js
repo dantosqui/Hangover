@@ -15,9 +15,6 @@ router.get("/", (req, res) => {
     
     try{
         const allEvents = eventService.getEvent(page, pageSize, tag, startDate, name, category, req.url);
-        if(allEvents){
-            return res.status(400).json({ error: 'El formato de fecha es inválido' });
-        }
         return res.json(allEvents);
     }catch(error){ 
         console.log("Error al buscar");
