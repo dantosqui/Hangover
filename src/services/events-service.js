@@ -107,6 +107,10 @@ export class EventsService {
         if(attended){
             mensajeCondicion += ` AND ee.attended = ${attended}`;
         }
+
+        if(rating){
+            mensajeCondicion += ` AND ee.rating = ${rating}`;
+        }
         
         const bd = new EventRepository();
         const resultado = bd.getParticipantsEvent(id, mensajeCondicion);

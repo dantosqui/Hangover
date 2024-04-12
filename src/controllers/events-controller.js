@@ -42,8 +42,10 @@ router.get("/:id/enrollment", (req, res) => {
     const last_name = req.query.last_name;
     const userName = req.query.userName;
     const attended = req.query.attended;
+    const rating = req.query.rating;
+
     try {
-        const event = eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended);
+        const event = eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
         if(!event){
             return res.status(400).json({ error: 'El formato de attended es inválido' });
         }
