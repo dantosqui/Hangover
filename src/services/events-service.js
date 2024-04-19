@@ -50,8 +50,9 @@ export class EventsService {
     const eventos = await bd.getEvent(mensajeCondicion, limit, offset);
     console.log(eventos)
     const resultado = {
+        
             collection: eventos,
-            pagination :
+            pagination:
                 {
                     query: mensajeCondicion,
                     limit: limit,
