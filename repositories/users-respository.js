@@ -1,10 +1,10 @@
-/*import pg from 'pg';
+import pg from 'pg';
 import { DBconfig } from "./db.js";
 
 const client = new pg.Client(DBconfig); 
-client.connect();*/
+client.connect();
 
-/*export class UserRepository {
+export class UserRepository {
     async getUser(username, password) {
         var query = "SELECT * FROM users WHERE username = "+username+" AND password = "+password; 
         return await client.query(query);
@@ -14,4 +14,4 @@ client.connect();*/
         var query = "SELECT * FROM users WHERE username = "+username;
         return await client.query(query);
     }
-}*/
+}

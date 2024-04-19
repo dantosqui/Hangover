@@ -1,10 +1,10 @@
-/*import pg from 'pg';
+import pg from 'pg';
 import { DBconfig } from "./db.js";
 
 const client = new pg.Client(DBconfig); 
-client.connect();*/
+client.connect();
 
-/*export class ProvincesRepository {
+export class ProvincesRepository {
     async createProvince(name, full_name, latitude, longitude, display_order) {
         var queryBase = "INSERT INTO provinces ([name], [full_name], [latitude], [longitude], [display_order]) VALUES ([ "+name+"], ["+full_name+"], ["+latitude+"], ["+longitude+"], ["+display_order+"])"; 
         const respuesta = await client.query(queryBase);
@@ -33,4 +33,4 @@ client.connect();*/
         var queryBase = "SELECT * FROM provinces WHERE id = "+id;
         return await client.query(queryBase);
     }
-}*/ 
+}

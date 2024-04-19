@@ -9,11 +9,11 @@ export class EventsService {
     //esto queda en la BD
     //parseo: 
     const regexFecha = /^\d{4}-\d{2}-\d{2}$/;
-    if(regexFecha.test(startDate)){
+    if(typeof startDate !== "undefined" && regexFecha.test(startDate)){
         return false;
     }
-
-    var mensajeCondicion;
+    console.log()
+    var mensajeCondicion = "";
 
     if(name){
         mensajeCondicion += ` WHERE name = ${name}`;
@@ -46,23 +46,19 @@ export class EventsService {
         }
     }
 
-    //const bd = new EventRepository();
+    const bd = new EventRepository();
+    const eventos = bd.getEvent(mensajeCondicion, pageSize, requestedPage);
     const resultado = [
         {
-            "hola": "como estas",
-            "soy": "un json",
-        },
-        {
-            "hola": "todo bien, vos?",
-            "soy": "un json yo tambien",
+            eventos: eventos,
         },
         {
             query: mensajeCondicion,
             pageSize: pageSize,
             page: requestedPage,
-            nextPage: `http://localhost:3508/${url}?limit=${pageSize}&offset=${requestedPage+1}`
+            nextPage: `http://localhost:3508/${url}`
         }
-    ];//bd.getEvent(mensajeCondicion, pageSize, requestedPage);
+    ];
     return resultado;
 /*
         
@@ -87,8 +83,20 @@ export class EventsService {
 
     getEventById(id){
 
-        const bd = new EventRepository();
-        const resultado = bd.getEventById(id);
+        //const bd = new EventRepository();
+        const resultado = [
+            {
+                "hola": "como estas",
+                "soy": "un json",
+            },
+            {
+                "hola": "todo bien, vos?",
+                "soy": "un json yo tambien",
+            },
+            {
+                query: id,
+            }
+        ];//bd.getEventById(id);
 
         return {
             resultado: resultado
@@ -96,12 +104,12 @@ export class EventsService {
     }
 
     getParticipantsEvent(id, first_name, last_name, userName, attended){
-
-        if(attended || !attended) {
+        console.log(attended);
+        if(typeof attended !== "boolean" && typeof attended !== "undefined") {
             return false;
         }
-
-        var mensajeCondicion;
+        
+        var mensajeCondicion = "";
         if(first_name){
             mensajeCondicion += ` AND u.first_name = ${first_name}`;
         }
@@ -122,8 +130,26 @@ export class EventsService {
             mensajeCondicion += ` AND ee.rating = ${rating}`;
         }
         
-        const bd = new EventRepository();
-        return bd.getParticipantsEvent(id, mensajeCondicion);
+        const resultado = [
+            {
+                "hola": "como estas",
+                "soy": "un json",
+            },
+            {
+                "hola": "todo bien, vos?",
+                "soy": "un json yo tambien",
+            },
+            {
+                d: id,
+                query: mensajeCondicion,
+            }
+        ];
+
+        return {
+            resultado: resultado
+        };
+        //const bd = new EventRepository();
+        //bd.getParticipantsEvent(id, mensajeCondicion);
     }
 
     createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){

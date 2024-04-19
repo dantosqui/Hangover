@@ -12,7 +12,8 @@ router.get("/", (req, res) => {
     const startDate = req.query.startDate;
     const name = req.query.name;
     const category = req.query.category;
-    
+    console.log(page);
+    console.log(pageSize);
     try{
         const allEvents = eventService.getEvent(page, pageSize, tag, startDate, name, category, req.url);
         return res.json(allEvents);
@@ -43,12 +44,14 @@ router.get("/:id/enrollment", (req, res) => {
 
     try {
         const participants = eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
-        if(participants){
+        if(!participants){
             return res.status(400).json({ error: 'El formato de attended es inválido' });
         }
+
         return res.json(participants);
     }
     catch(error){
+        console.log(first_name);
         console.log("Error al buscar");
         return res.json("Un Error");
     }

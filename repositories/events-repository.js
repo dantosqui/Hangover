@@ -1,4 +1,4 @@
-/*import pg from 'pg';
+import pg from 'pg';
 import { DBconfig } from "./db.js";
 
 const client = new pg.Client(DBconfig); 
@@ -11,7 +11,8 @@ client.connect();
 
 export class EventRepository {
     async getEvent(mensajeCondicion, pageSize, requestedPage) {
-        var queryBase = "SELECT * FROM events INNER JOIN event_categories ON event.id_event_category = event_categories.id LEFT JOIN event_tags ON event_tags.id_event = event.id INNER JOIN tags ON event_tags.id_tag = tags.id" + mensajeCondicion + `limit ${pageSize} offset ${requestedPage+1}`;
+        console.log(mensajeCondicion);
+        var queryBase = "SELECT * FROM events INNER JOIN event_categories ON events.id_event_category = event_categories.id LEFT JOIN event_tags ON event_tags.id_event = events.id INNER JOIN tags ON event_tags.id_tag = tags.id" + mensajeCondicion + `limit ${pageSize} offset ${requestedPage+1}`;
 
         const respuesta = await client.query(queryBase);
         return respuesta.rows;
@@ -38,7 +39,7 @@ export class EventRepository {
         return await client.query(query);
     }
 
-    aync deleteEvent(id){
+    async deleteEvent(id){
         const query = "DELETE FROM events WHERE id = "+id;
         return await client.query(query);
     }
@@ -62,4 +63,4 @@ export class EventRepository {
         }
         return false;
     }
-}*/
+}
