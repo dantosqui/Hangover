@@ -9,7 +9,7 @@ const port = 3508;
 
 app.use("/event", EventsController);
 app.use("/user", UsersController);
-app.use("/provinces", ProvincesController);
+app.use("/provinces", ProvincesController); 
 
 app.listen(port, () => {
     console.log(`Server is runing on port ${port}`);

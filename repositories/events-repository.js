@@ -1,7 +1,7 @@
 import pg from 'pg';
-import { DBconfig } from "./db.js";
+import { DBConfig } from "./dbconfig.js";
 
-const client = new pg.Client(DBconfig); 
+const client = new pg.Client(DBConfig); 
 client.connect();
 
 //const sql = "select * from events";
@@ -10,10 +10,10 @@ client.connect();
 
 
 export class EventRepository {
-    async getEvent(mensajeCondicion, pageSize, requestedPage) {
+    async getEvent(mensajeCondicion, limit, offset) {
         console.log(mensajeCondicion);
-        var queryBase = "SELECT * FROM events INNER JOIN event_categories ON events.id_event_category = event_categories.id LEFT JOIN event_tags ON event_tags.id_event = events.id INNER JOIN tags ON event_tags.id_tag = tags.id" + mensajeCondicion + `limit ${pageSize} offset ${requestedPage+1}`;
-
+        var queryBase = "SELECT * FROM events INNER JOIN event_categories ON events.id_event_category = event_categories.id LEFT JOIN event_tags ON event_tags.id_event = events.id INNER JOIN tags ON event_tags.id_tag = tags.id" + mensajeCondicion + ` limit ${limit} offset ${offset}`;
+        console.log(queryBase);
         const respuesta = await client.query(queryBase);
         return respuesta.rows;
     }

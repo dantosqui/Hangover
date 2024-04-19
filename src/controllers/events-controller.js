@@ -5,17 +5,22 @@ import {EventsService} from "../services/events-service.js";
 const router = express.Router();
 const eventService = new EventsService();
 
-router.get("/", (req, res) => {
-    const pageSize = req.query.pageSize;
-    const page = req.query.page;
+router.get("/", async (req, res) => {
+    const limit = req.query.limit ?? 0;
+    const offset = req.query.offset ?? 1;
     const tag = req.query.tag;
     const startDate = req.query.startDate;
     const name = req.query.name;
     const category = req.query.category;
-    console.log(page);
-    console.log(pageSize);
+
+    const nextPage = req.originalUrl.replace(/(offset=)\d+/, 'offset=' + (parseInt(offset) + 1));
+    console.log(nextPage);
+
     try{
-        const allEvents = eventService.getEvent(page, pageSize, tag, startDate, name, category, req.url);
+        const allEvents = await eventService.getEvent(offset, limit, tag, startDate, name, category, nextPage);
+        //allEvents.pagination.offset = allEvents.pagination.offset +1;
+
+        console.log("Estoy en el controller: ", allEvents)
         return res.json(allEvents);
     }catch(error){ 
         console.log("Error al buscar");
@@ -24,9 +29,9 @@ router.get("/", (req, res) => {
     
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
-        const event = eventService.getEventById(req.params.id);
+        const event = await eventService.getEventById(req.params.id);
         return res.json(event);
     }
     catch(error){
@@ -35,7 +40,7 @@ router.get("/:id", (req, res) => {
     }
 });
 
-router.get("/:id/enrollment", (req, res) => {
+router.get("/:id/enrollment", async (req, res) => {
     const first_name = req.query.first_name;
     const last_name = req.query.last_name;
     const userName = req.query.userName;
@@ -43,7 +48,7 @@ router.get("/:id/enrollment", (req, res) => {
     const rating = req.query.rating;
 
     try {
-        const participants = eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
+        const participants = await eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
         if(!participants){
             return res.status(400).json({ error: 'El formato de attended es inválido' });
         }

@@ -1,8 +1,9 @@
 import { query } from "express";
-//import { EventRepository } from "../../repositories/events-repository.js";
+import { EventRepository } from "../../repositories/events-repository.js";
 
+const bd = new EventRepository();
 export class EventsService {
-    getEvent(requestedPage, pageSize, tag, startDate, name, category, url){
+    async getEvent(offset, limit, tag, startDate, name, category, nextPage){
 
         //const eventRepository = new EventRepository();
         //const eventInDB = eventRepository.getAllEvents(); 
@@ -12,7 +13,6 @@ export class EventsService {
     if(typeof startDate !== "undefined" && regexFecha.test(startDate)){
         return false;
     }
-    console.log()
     var mensajeCondicion = "";
 
     if(name){
@@ -45,20 +45,20 @@ export class EventsService {
             mensajeCondicion += ` WHERE tags.tag = ${tag}`;
         }
     }
+    console.log("hola");
 
-    const bd = new EventRepository();
-    const eventos = bd.getEvent(mensajeCondicion, pageSize, requestedPage);
-    const resultado = [
-        {
-            eventos: eventos,
-        },
-        {
-            query: mensajeCondicion,
-            pageSize: pageSize,
-            page: requestedPage,
-            nextPage: `http://localhost:3508/${url}`
-        }
-    ];
+    const eventos = await bd.getEvent(mensajeCondicion, limit, offset);
+    console.log(eventos)
+    const resultado = {
+            collection: eventos,
+            pagination :
+                {
+                    query: mensajeCondicion,
+                    limit: limit,
+                    offset: offset,
+                    nextPage: `http://localhost:3508${nextPage}`
+                }
+            };
     return resultado;
 /*
         
