@@ -12,26 +12,60 @@ client.connect();
 export class EventRepository {
     async getEvent(mensajeCondicion, limit, offset) {
         console.log(mensajeCondicion);
-        var queryBase = /*"SELECT e.id, e.name, e.description, e.start_date, e.duration_in_minutes, e.price, e.enabled_for_enrollment, e.max_assistance, t.tags 
-        json_build_object (
-            'id', u.id,
-            'username', u.username,
-            'first_name', u.first_name,
-            'last_name', u.last_name
-        ) AS creator_user,
-        json_build_object (
-            'id', ec.id,
-            'name', ec.name,
-        ) as event_category,
-        json_build_object (
-            'id', el.id,
-            'name', el.username,
-            'full_address', el.full_address,
-            'latitude', el.latitude,
-            'longitude', el.longitude,
-            'max_capacity', el.max_capacity
-        ) as event_location
-        FROM events e INNER JOIN event_categories ec ON e.id_event_category = ec.id LEFT JOIN event_tags et ON et.id_event = e.id INNER JOIN tags t ON et.id_tag = t.id" + mensajeCondicion + ` limit ${limit} offset ${offset}`;*/
+        var queryBase = `
+        SELECT 
+            e.id, 
+            e.name, 
+            e.description, 
+            e.start_date, 
+            e.duration_in_minutes, 
+            e.price, 
+            e.enabled_for_enrollment, 
+            e.max_assistance, 
+            (
+                SELECT json_agg(t.name)
+                FROM event_tags et
+                INNER JOIN tags t ON et.id_tag = t.id
+                WHERE et.id_event = e.id
+            ) AS tags,
+            json_build_object (
+                'id', u.id,
+                'username', u.username,
+                'first_name', u.first_name,
+                'last_name', u.last_name
+            ) AS creator_user,
+            json_build_object (
+                'id', ec.id,
+                'name', ec.name
+            ) AS event_category,
+            json_build_object (
+                'id', el.id,
+                'name', el.name,
+                'full_address', el.full_address,
+                'latitude', el.latitude,
+                'longitude', el.longitude,
+                'max_capacity', el.max_capacity
+            ) AS event_location
+        FROM 
+            events e 
+        INNER JOIN 
+            event_categories ec ON e.id_event_category = ec.id 
+        LEFT JOIN 
+            event_tags et ON et.id_event = e.id 
+        INNER JOIN 
+            tags t ON et.id_tag = t.id
+		INNER JOIN
+			users u ON e.id_creator_user = u.id
+		INNER JOIN event_locations el ON e.id_event_location = el.id
+        ${mensajeCondicion} 
+    `;
+    if (limit !== null && limit !== undefined && limit !== 0) {
+        queryBase += ` LIMIT ${limit}`;
+        if (offset !== null && offset !== undefined) {
+            queryBase += ` OFFSET ${offset}`;
+        }
+    }
+    
         console.log(queryBase);
         const respuesta = await client.query(queryBase);
         return respuesta.rows;

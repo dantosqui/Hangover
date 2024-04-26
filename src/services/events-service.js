@@ -16,36 +16,36 @@ export class EventsService {
     var mensajeCondicion = "";
 
     if(name){
-        mensajeCondicion += ` WHERE name = ${name}`;
+        mensajeCondicion += ` WHERE e.name = '${name}'`;
     }
 
     if(category){
         if(mensajeCondicion.includes("WHERE")){
-            mensajeCondicion += ` AND event_categories.category = ${category}`;
+            mensajeCondicion += ` AND ec.name = '${category}'`;
         }
         else{
-            mensajeCondicion += ` WHERE event_categories.category = ${category}`;
+            mensajeCondicion += ` WHERE ec.name = '${category}'`;
         }
     }
 
     if (startDate){
         if(mensajeCondicion.includes("WHERE")){
-            mensajeCondicion += ` AND startDate = ${startDate}`;
+            mensajeCondicion += ` AND e.startDate = '${startDate}'`;
         }
         else{
-            mensajeCondicion += ` WHERE startDate = ${startDate}`;
+            mensajeCondicion += ` WHERE e.startDate = '${startDate}'`;
         }
     }
 
     if(tag){
         if(mensajeCondicion.includes("WHERE")){
-            mensajeCondicion += ` AND tags.tag = ${tag}`;
+            mensajeCondicion += ` AND t.name = '${tag}'`;
         }
         else{
-            mensajeCondicion += ` WHERE tags.tag = ${tag}`;
+            mensajeCondicion += ` WHERE t.name = '${tag}'`;
         }
     }
-    console.log("hola");
+    console.log(mensajeCondicion);
 
     const eventos = await bd.getEvent(mensajeCondicion, limit, offset);
     console.log(eventos)
@@ -54,10 +54,10 @@ export class EventsService {
             collection: eventos,
             pagination:
                 {
-                    query: mensajeCondicion,
                     limit: limit,
                     offset: offset,
-                    nextPage: `http://localhost:3508${nextPage}`
+                    nextPage: `http://localhost:3508${nextPage}`,
+                    total: eventos.length
                 }
             };
     return resultado;
