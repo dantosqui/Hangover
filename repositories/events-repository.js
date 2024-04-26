@@ -72,19 +72,19 @@ export class EventRepository {
     }
 
     async getEventById(id) {
-        const query = "SELECT * FROM events e INNER JOIN event_locations el ON e.id_event_location = el.id INNER JOIN locations l ON el.id_location = l.id WHERE e.id_event = " + id;
+        const query = "SELECT * FROM events e INNER JOIN event_locations el ON e.id_event_location = el.id INNER JOIN locations l ON el.id_location = l.id INNER JOIN provinces p ON l.id_province = p.id WHERE e.id = " + id;
         const respuesta = await client.query(query);
         return respuesta.rows;
     }
 
     async getParticipantEvent(id, mensajeCondicion){
-        const query = "SELECT u.id, u.username, u.first_name, u.last_name, ee.attended, ee. rating FROM event_enrollments ee INNER JOIN users u on ee.id_user = u.id WHERE ee.id_event = " + id + mensajeCondicion;
+        const query = "SELECT u.id, u.username, u.first_name, u.last_name, ee.attended, ee.rating FROM event_enrollments ee INNER JOIN users u on ee.id_user = u.id WHERE ee.id_event = " + id + mensajeCondicion;
         const respuesta = await client.query(query);
         return respuesta.rows;
     }
 
-    async createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
-        const query = "INSERT INTO events ([name],[description],[id_event_category],[id_event_location],[start_date],[duration_in_minutes],[price],[enabled_for_enrrolment],[max_assistance],[id_creator_user]) VALUES ([ "+name+"], ["+full_name+"], ["+latitude+"], ["+longitude+"], ["+display_order+"]),"
+    async createEvent(event){
+        const query = "INSERT INTO events ([name],[description],[id_event_category],[id_event_location],[start_date],[duration_in_minutes],[price],[enabled_for_enrrolment],[max_assistance],[id_creator_user]) VALUES (["+event.name+"], ["+event.description+"], ["+event.id_event_category+"], ["+event.id_event_location+"], ["+event.start_date+"], ["+event.duration_in_minutes+"],)"
     }
 
     async updateEvent(id, keys, values){

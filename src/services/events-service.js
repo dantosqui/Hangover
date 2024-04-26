@@ -82,29 +82,14 @@ export class EventsService {
         //Ir a base de datos...`http://localhost:3000/${url}?limit=${pageSize}&offset=${requestedPage+1}`*/
     }
 
-    getEventById(id){
+    async getEventById(id){
 
-        //const bd = new EventRepository();
-        const resultado = [
-            {
-                "hola": "como estas",
-                "soy": "un json",
-            },
-            {
-                "hola": "todo bien, vos?",
-                "soy": "un json yo tambien",
-            },
-            {
-                query: id,
-            }
-        ];//bd.getEventById(id);
-
-        return {
-            resultado: resultado
-        };
+        const bd = new EventRepository();
+        const resultado = await bd.getEventById(id);
+        return resultado;
     }
 
-    getParticipantsEvent(id, first_name, last_name, userName, attended){
+    async getParticipantsEvent(id, first_name, last_name, userName, attended, rating){
         console.log(attended);
         if(typeof attended !== "boolean" && typeof attended !== "undefined") {
             return false;
@@ -112,50 +97,33 @@ export class EventsService {
         
         var mensajeCondicion = "";
         if(first_name){
-            mensajeCondicion += ` AND u.first_name = ${first_name}`;
+            mensajeCondicion += ` AND u.first_name = '${first_name}'`;
         }
         
         if(last_name){
-            mensajeCondicion += ` AND u.last_name = ${last_name}`;
+            mensajeCondicion += ` AND u.last_name = '${last_name}'`;
         }
 
         if(userName){
-            mensajeCondicion += ` AND u.username = ${userName}`;
+            mensajeCondicion += ` AND u.username = '${userName}'`;
         }
 
         if(attended){
             mensajeCondicion += ` AND ee.attended = ${attended}`;
         }
-
         if(rating){
             mensajeCondicion += ` AND ee.rating = ${rating}`;
         }
         
-        const resultado = [
-            {
-                "hola": "como estas",
-                "soy": "un json",
-            },
-            {
-                "hola": "todo bien, vos?",
-                "soy": "un json yo tambien",
-            },
-            {
-                d: id,
-                query: mensajeCondicion,
-            }
-        ];
+        const bd = new EventRepository();
+        const resultado = await bd.getParticipantsEvent(id, mensajeCondicion);
+        return resultado;  
 
-        return {
-            resultado: resultado
-        };
-        //const bd = new EventRepository();
-        //bd.getParticipantsEvent(id, mensajeCondicion);
     }
 
-    createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user){
+    async createEvent(event){
         const bd = new EventRepository();
-        const resultado = bd.createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user);
+        const resultado = await bd.createEvent(event);
         if(resultado != null){
             return true;
         }

@@ -49,33 +49,37 @@ router.get("/:id/enrollment", async (req, res) => {
 
     try {
         const participants = await eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
-        if(!participants){
+        if(participants){
+            return res.json(participants);
+        }
+        else{
             return res.status(400).json({ error: 'El formato de attended es inválido' });
         }
-
-        return res.json(participants);
+        
     }
     catch(error){
-        console.log(first_name);
+        console.log("hola");
         console.log("Error al buscar");
         return res.json("Un Error");
     }
 });
 
 router.post("/", (req, res) => {
-    const name = req.body.name;
-    const description = req.body.description;
-    const id_event_category = req.body.id_event_category;
-    const id_event_location = req.body.id_event_location;
-    const start_date = req.body.start_date;
-    const duration_in_minutes = req.body.duration_in_minutes;
-    const price = req.body.price;
-    const enabled_for_enrollment = req.body.enabled_for_enrollment;
-    const max_assistance = req.body.max_assistance;
-    const id_creator_user = req.body.id_creator_user;
+    const event = {
+        name: req.body.name,
+        description: req.body.description,
+        id_event_category: req.body.id_event_category,
+        id_event_location: req.body.id_event_location,
+        start_date: req.body.start_date,
+        duration_in_minutes: req.body.duration_in_minutes,
+        price: req.body.price,
+        enabled_for_enrollment: req.body.enabled_for_enrollment,
+        max_assistance: req.body.max_assistance,
+        id_creator_user: req.body.id_creator_user
+    }
     
-    if(name && description && id_event_category && id_event_location && start_date && duration_in_minutes && price && enabled_for_enrollment && max_assistance && id_creator_user){
-        if(eventService.createEvent(name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user)){
+    if(event){
+        if(eventService.createEvent(event)){
             return res.status(232).send({
                 valido: "evento creado correctamente",
             });
