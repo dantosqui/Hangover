@@ -1,9 +1,10 @@
 import { query } from "express";
+import { ProvinceRepository } from "../../repositories/provinces-repository.js";
 
 export class ProvincesService{
     
     createProvince(name, full_name, latitude, longitude, display_order){
-        const bd = new ProvincesRepository();
+        const bd = new ProvinceRepository();
         const resultado = bd.createProvince(name, full_name, latitude, longitude, display_order);
         if(resultado != null){
             return true;
@@ -12,7 +13,7 @@ export class ProvincesService{
     }
 
     updateProvince(id, keys, values){
-        const bd = new ProvincesRepository();
+        const bd = new ProvinceRepository();
         var mensajeCondicion;
         const resultado = bd.updateProvince(id, mensajeCondicion);
         if(resultado != null){
@@ -22,12 +23,12 @@ export class ProvincesService{
     }
 
     deleteProvincia(id){
-        const bd = new ProvincesRepository();
+        const bd = new ProvinceRepository();
         return bd.deleteProvince(id);
     }
 
     getAllProvinces(requestedPage, pageSize, url){
-        const bd = new ProvincesRepository();
+        const bd = new ProvinceRepository();
         const resultado = bd.getAllProvinces();
         return {
             pageSize: pageSize,
@@ -37,7 +38,7 @@ export class ProvincesService{
     }
 
     getProvinceById(id){
-        const bd = new ProvincesRepository();
+        const bd = new ProvinceRepository();
         const resultado = bd.getProvinceById(id);
         return resultado;
     }

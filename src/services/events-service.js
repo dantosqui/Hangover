@@ -1,14 +1,9 @@
 import { query } from "express";
 import { EventRepository } from "../../repositories/events-repository.js";
 
-const bd = new EventRepository();
 export class EventsService {
     async getEvent(offset, limit, tag, startDate, name, category, nextPage){
 
-        //const eventRepository = new EventRepository();
-        //const eventInDB = eventRepository.getAllEvents(); 
-    //esto queda en la BD
-    //parseo: 
     const regexFecha = /^\d{4}-\d{2}-\d{2}$/;
     if(typeof startDate !== "undefined" && regexFecha.test(startDate)){
         return false;
@@ -46,7 +41,7 @@ export class EventsService {
         }
     }
     console.log(mensajeCondicion);
-
+    const bd = new EventRepository();
     const eventos = await bd.getEvent(mensajeCondicion, limit, offset);
     console.log(eventos)
     const resultado = {
@@ -61,25 +56,6 @@ export class EventsService {
                 }
             };
     return resultado;
-/*
-        
-        return {
-            collection:  [{
-                "id": 4,
-                "name": "4 fromages",
-                "prices": 12.5
-            },
-            {
-                "id": 2,
-                "name": "4 fromages",
-                "prices": 24.5
-            }],
-            pageSize: 15,
-            page: 1,
-            nextPage: `http://localhost:3508/event?limit=${15}&offset=${1+1}`
-        };
-
-        //Ir a base de datos...`http://localhost:3000/${url}?limit=${pageSize}&offset=${requestedPage+1}`*/
     }
 
     async getEventById(id){
@@ -89,9 +65,9 @@ export class EventsService {
         return resultado;
     }
 
-    async getParticipantsEvent(id, first_name, last_name, userName, attended, rating){
+    async getParticipantEvent(id, first_name, last_name, username, attended, rating){
         console.log(attended);
-        if(typeof attended !== "boolean" && typeof attended !== "undefined") {
+        if(typeof attended !== "undefined" && attended != "true" && attended != "false") {
             return false;
         }
         
@@ -104,8 +80,8 @@ export class EventsService {
             mensajeCondicion += ` AND u.last_name = '${last_name}'`;
         }
 
-        if(userName){
-            mensajeCondicion += ` AND u.username = '${userName}'`;
+        if(username){
+            mensajeCondicion += ` AND u.username = '${username}'`;
         }
 
         if(attended){
@@ -116,9 +92,19 @@ export class EventsService {
         }
         
         const bd = new EventRepository();
-        const resultado = await bd.getParticipantsEvent(id, mensajeCondicion);
-        return resultado;  
-
+        const participants = await bd.getParticipantEvent(id, mensajeCondicion);
+        const resultado = {
+        
+            collection: participants,
+            pagination:
+                {
+                    limit: limit,
+                    offset: offset,
+                    nextPage: `http://localhost:3508${nextPage}`,
+                    total: eventos.length
+                }
+        };
+        return resultado;
     }
 
     async createEvent(event){

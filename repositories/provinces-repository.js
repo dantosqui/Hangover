@@ -4,9 +4,9 @@ import { DBConfig } from "./dbconfig.js";
 const client = new pg.Client(DBConfig); 
 client.connect();
 
-export class ProvincesRepository {
-    async createProvince(name, full_name, latitude, longitude, display_order) {
-        var queryBase = "INSERT INTO provinces ([name], [full_name], [latitude], [longitude], [display_order]) VALUES ([ "+name+"], ["+full_name+"], ["+latitude+"], ["+longitude+"], ["+display_order+"])"; 
+export class ProvinceRepository {
+    async createProvince(province) {
+        var queryBase = "INSERT INTO provinces (name, full_name, latitude, longitude, display_order) VALUES ("+province.name+", "+province.full_name+", "+province.latitude+", "+province.longitude+", "+province.display_order+")"; 
         const respuesta = await client.query(queryBase);
         if(respuesta != null){
 
@@ -25,7 +25,7 @@ export class ProvincesRepository {
     }
 
     async getAllProvinces(pageSize, requestedPage) {
-        var queryBase = "SELECT * FROM provinces limit "+pageSize+" offset "+requestedPage;
+        var queryBase = "SELECT * FROM provinces limit ="+pageSize+" offset ="+requestedPage;
         return await client.query(queryBase);
     }
 

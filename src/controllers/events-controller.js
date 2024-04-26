@@ -6,7 +6,7 @@ const router = express.Router();
 const eventService = new EventsService();
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit ?? 0;
+    const limit = req.query.limit ?? null;
     const offset = req.query.offset ?? 1;
     const tag = req.query.tag;
     const startDate = req.query.startDate;
@@ -43,12 +43,12 @@ router.get("/:id", async (req, res) => {
 router.get("/:id/enrollment", async (req, res) => {
     const first_name = req.query.first_name;
     const last_name = req.query.last_name;
-    const userName = req.query.userName;
+    const username = req.query.username;
     const attended = req.query.attended;
     const rating = req.query.rating;
 
     try {
-        const participants = await eventService.getParticipantsEvent(req.params.id, first_name, last_name, userName, attended, rating);
+        const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating);
         if(participants){
             return res.json(participants);
         }
@@ -58,13 +58,14 @@ router.get("/:id/enrollment", async (req, res) => {
         
     }
     catch(error){
+        console.log(error);
         console.log("hola");
         console.log("Error al buscar");
         return res.json("Un Error");
     }
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     const event = {
         name: req.body.name,
         description: req.body.description,
@@ -79,7 +80,8 @@ router.post("/", (req, res) => {
     }
     
     if(event){
-        if(eventService.createEvent(event)){
+        const eventoCreado = await eventService.createEvent(event);
+        if(eventoCreado){
             return res.status(232).send({
                 valido: "evento creado correctamente",
             });
@@ -88,11 +90,12 @@ router.post("/", (req, res) => {
     return res.status(400).send("Error en los campos");
 });
 
-router.patch( "/:id", (req,res) =>{
+router.patch( "/:id", async (req,res) =>{
     const id=req.params.id;
     const body = req.body;
     if(Object.keys(body) && Object.values(body)){
-        if(eventService.updateEvent(id, Object.keys(body), Object.values(body))){
+        const eventoActualizado = await eventService.updateEvent(id, Object.keys(body), Object.values(body))
+        if(eventoActualizado){
             return res.status(232).send({
                 valido: "evento actualizado correctamente"
             });
@@ -101,9 +104,10 @@ router.patch( "/:id", (req,res) =>{
     return res.status(400).send("Error en los campos");
 });
 
-router.delete( "/:id", (req,res) =>{
+router.delete( "/:id", async (req,res) =>{
     const id=req.params.id;
-    if(eventService.deleteEvent(id)){
+    const eventoEliminado = await eventService.deleteEvent(id);
+    if(eventoEliminado){
         return res.status(232).send({
             valido: "evento eliminado correctamente"
         });
@@ -111,7 +115,7 @@ router.delete( "/:id", (req,res) =>{
     return res.status(400).send("Error en los campos");
 });
 
-router.post("/:id/enrollment", (req, res) => {
+router.post("/:id/enrollment", async (req, res) => {
     const id=req.params.id;
     const description = req.query.description;
     const attended = req.query.attended;
@@ -120,14 +124,16 @@ router.post("/:id/enrollment", (req, res) => {
     const id_user = req.body.id_user;
 
     if(id_user && description && attended && observations && rating){
-        if(eventService.uploadUserStuff(id, id_user, description, attended, observations, rating)){
+        const eventoActualizado = await eventService.uploadUserStuff(id, id_user, description, attended, observations, rating);
+        if(eventoActualizado){
             return res.status(232).send({
                 valido: "usuario inscripto correctamente"
             });
         }
     }
     else if(id_user){
-        if(eventService.insertEnrollment(id, id_user)){
+        const enrollmentInsertado = await eventService.insertEnrollment(id, id_user);
+        if(enrollmentInsertado){
             return res.status(232).send({
                 valido: "usuario inscripto correctamente"
             });
