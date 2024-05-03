@@ -114,9 +114,23 @@ export class EventRepository {
         return await this.DBClient.query(query, values);
     }
 
-    async updateEvent(id, keys, values){
-        const query = "UPDATE events SET "+keys+" = "+values+" WHERE id = "+id;
-        return await this.DBClient.query(query);
+    async updateEvent(id, event){
+        const attributes = []
+        
+        if(event.name) attributes.push(`name = ${event.name}`);
+        if(event.description) attributes.push(`description = ${event.description}`);
+        if(event.id_event_category) attributes.push(`id_event_category = ${event.id_event_category}`);
+        if(event.id_event_location) attributes.push(`id_event_location = ${event.id_event_location}`);
+        if(event.start_date) attributes.push(`start_date = ${event.start_date}`);
+        if(event.duration_in_minutes) attributes.push(`duration_in_minutes = ${event.duration_in_minutes}`);
+        if(event.price) attributes.push(`price = ${event.price}`);
+        if(event.enabled_for_enrollment) attributes.push(`enabled_for_enrollment = ${event.enabled_for_enrollment}`);
+        if(event.max_assistance) attributes.push(`max_assistance = ${event.max_assistance}`);
+        if(event.id_creator_user) attributes.push(`id_creator_user = ${event.id_creator_user}`);
+
+        const sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1`;
+        const values = [id];
+        return await this.DBClient.query(sql, values);
     }
 
     async deleteEvent(id){

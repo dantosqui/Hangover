@@ -66,7 +66,8 @@ router.get("/:id/enrollment", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const event = {
+    const event = new Event();
+    event = {
         name: req.body.name,
         description: req.body.description,
         id_event_category: req.body.id_event_category,
@@ -92,15 +93,26 @@ router.post("/", async (req, res) => {
 
 router.patch( "/:id", async (req,res) =>{
     const id=req.params.id;
-    const body = req.body;
-    if(Object.keys(body) && Object.values(body)){
-        const eventoActualizado = await eventService.updateEvent(id, Object.keys(body), Object.values(body))
+
+    const event = new Event();
+    event.name = req.body.name;
+    event.description = req.body.description;
+    event.id_event_category = req.body.id_event_category;
+    event.id_event_location = req.body.id_event_location;
+    event.start_date = req.body.start_date;
+    event.duration_in_minutes = req.body.duration_in_minutes;
+    event.price = req.body.price;
+    event.enabled_for_enrollment = req.body.enabled_for_enrollment;
+    event.max_assistance = req.body.max_assistance;
+    event.id_creator_user = req.body.id_creator_user;
+
+        const eventoActualizado = await eventService.updateEvent(id, event)
         if(eventoActualizado){
             return res.status(232).send({
                 valido: "evento actualizado correctamente"
             });
         }
-    }
+    
     return res.status(400).send("Error en los campos");
 });
 

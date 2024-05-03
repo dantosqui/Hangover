@@ -14,8 +14,9 @@ export class ProvincesService{
         return false;
     }
 
-    updateProvince(id, keys, values){
-        const resultado = bd.updateProvince(id, keys, values);
+    updateProvince(id, province){
+
+        const resultado = bd.updateProvince(id, province);
         if(resultado != null){
             return true;
         }
@@ -26,11 +27,11 @@ export class ProvincesService{
         return bd.deleteProvince(id);
     }
 
-    getAllProvinces(requestedPage, pageSize, url){
+    getAllProvinces(offset, limit, url){
         const resultado = bd.getAllProvinces();
         return {
-            pageSize: pageSize,
-            page: requestedPage,
+            limit: limit,
+            offset: offset,
             nextPage: `http://localhost:3508/${url}?limit=${pageSize}&offset=${requestedPage+1}`
         };
     }

@@ -29,18 +29,20 @@ router.post("/", async (req,res)=>{
 
 router.patch( "/:id", async (req,res) =>{
     const id=req.params.id;
-    const body = req.body;
 
     const province = new Province();
+    province.name = req.body.name;
+    province.full_name = req.body.full_name;
+    province.latitude = req.body.latitude;
+    province.longitude = req.body.longitude;
+    province.display_order = req.body.display_order
 
-    if(){
-        const provincia = await provinceService.updateProvince(id, );
+        const provincia = await provinceService.updateProvince(id, province);
         if(provincia){
             return res.status(232).send({
                 valido: "provincia actualizada correctamente",
             });
         }
-    }
     return res.status(400).send("Error en los campos");
 });
 

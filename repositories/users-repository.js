@@ -10,16 +10,32 @@ export class UserRepository {
     }
 
     async getUser(username, password) {
-        const query = "SELECT * FROM users WHERE username = $1 AND password = $2"; 
-        const values = [`'${username}'`, `'${password}'`];
-        const respuesta = await this.DBClient.query(query);
-        return respuesta.rows;
+        try {
+            const query = "SELECT * FROM users WHERE username = $1 AND password = $2"; 
+            const values = [`'${username}'`, `'${password}'`];
+            const respuesta = await this.DBClient.query(query);
+            if(respuesta.rows.length > 0){
+                return respuesta.rows;
+            }
+        }
+        catch(error){
+            console.log(error);
+        }
+        return false;
     }
 
     async validateUsername(username){
-        const query = "SELECT * FROM users WHERE username = $1";
-        const values = [`'${username}'`];
-        const respuesta = await this.DBClient.query(query, values);
-        return respuesta.rows;
+        try {
+            const query = "SELECT * FROM users WHERE username = $1";
+            const values = [`'${username}'`];
+            const respuesta = await this.DBClient.query(query, values);
+            if(respuesta.rows.length = 0){
+                return respuesta.rows;
+            }
+        }
+        catch(error){
+            console.log(error);
+        }
+        return true;
     }
 }
