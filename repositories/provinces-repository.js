@@ -1,36 +1,43 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 
-const client = new pg.Client(DBConfig); 
-client.connect();
 
 export class ProvinceRepository {
-    async createProvince(province) {
-        var queryBase = "INSERT INTO provinces (name, full_name, latitude, longitude, display_order) VALUES ("+province.name+", "+province.full_name+", "+province.latitude+", "+province.longitude+", "+province.display_order+")"; 
-        const respuesta = await client.query(queryBase);
-        if(respuesta != null){
+    constructor() {
+        const { Client } = pg;
+        this.DBClient = new Client(DBConfig);
+        this.DBClient.connect();
+    }
 
-        }
-        return await client.query(queryBase);
+    async createProvince(province) {
+        const sql = "INSERT INTO provinces (name, full_name, latitude, longitude, display_order) VALUES ($1, $2, $3, $4, $5)"; 
+        const values = [province.name, province.full_name, province.latitude, province.longitude, province.display_order];
+        const respuesta = await this.DBClient.query(sql, values);
+        return respuesta.rows;
     }
 
     async deleteProvince(id) {
-        var queryBase = "DELETE FROM provinces WHERE id = "+id;
-        return await client.query(queryBase);
+        const sql = "DELETE FROM provinces WHERE id = $1";
+        const values = [id];
+        return await this.DBClient.query(sql,values);
     }
 
-    async actualizarProvince(id, mensajeCondicion) {
-        var queryBase = "UPDATE provinces "+mensajeCondicion+" WHERE id = "+id;
-        return await client.query(queryBase);
+    async actualizarProvince(id, keys, values) {
+        const sql = "UPDATE provinces "+mensajeCondicion+" WHERE id = $1";
+        const values = values;
+        return await this.DBClient.query(sql,values);
     }
 
     async getAllProvinces(pageSize, requestedPage) {
-        var queryBase = "SELECT * FROM provinces limit ="+pageSize+" offset ="+requestedPage;
-        return await client.query(queryBase);
+        const sql = "SELECT * FROM provinces limit = $1 offset = $2";
+        const values = [pageSize, requestedPage];
+        return await this.DBClient.query(sql, values);
     }
 
     async getProvinceById(id) {
-        var queryBase = "SELECT * FROM provinces WHERE id = "+id;
-        return await client.query(queryBase);
+        const sql = "SELECT * FROM provinces WHERE id = $1";
+        const values = [id];
+        
+        return await this.DBClient.query(sql,values);
     }
 }

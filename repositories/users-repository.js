@@ -1,19 +1,25 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 
-const client = new pg.Client(DBConfig); 
-client.connect();
 
 export class UserRepository {
+    constructor() {
+        const { Client } = pg;
+        this.DBClient = new Client(DBConfig);
+        this.DBClient.connect();
+    }
+
     async getUser(username, password) {
-        var query = "SELECT * FROM users WHERE username = '"+username+"' AND password = '"+password+"'"; 
-        const respuesta = await client.query(query);
+        const query = "SELECT * FROM users WHERE username = $1 AND password = $2"; 
+        const values = [`'${username}'`, `'${password}'`];
+        const respuesta = await this.DBClient.query(query);
         return respuesta.rows;
     }
 
     async validateUsername(username){
-        var query = "SELECT * FROM users WHERE username = '"+username+"'";
-        const respuesta = await client.query(query);
+        const query = "SELECT * FROM users WHERE username = $1";
+        const values = [`'${username}'`];
+        const respuesta = await this.DBClient.query(query, values);
         return respuesta.rows;
     }
 }

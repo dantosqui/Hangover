@@ -1,17 +1,15 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 
-const client = new pg.Client(DBConfig); 
-client.connect();
-
-//const sql = "select * from events";
-//const respuesta = await client.query(sql);// el await ESPERA. sirve para que no empiece a ejecutar otras cosas sin esto
-
-
 
 export class EventRepository {
+    constructor() {
+        const { Client } = pg;
+        this.DBClient = new Client(DBConfig);
+        this.DBClient.connect();
+    }
+
     async getEvent(mensajeCondicion, limit, offset) {
-        console.log(mensajeCondicion);
         var queryBase = `
         SELECT 
             e.id, 
@@ -60,20 +58,30 @@ export class EventRepository {
         ${mensajeCondicion} 
     `;
     if (limit !== null && limit !== undefined && limit !== 0) {
-        queryBase += ` LIMIT ${limit}`;
+        queryBase += ` LIMIT = $1`;
+        values = [limit];
         if (offset !== null && offset !== undefined) {
-            queryBase += ` OFFSET ${offset}`;
+            queryBase += ` OFFSET = $2`;
+            values = [limit, offset];
         }
+        const respuesta = await this.DBClient.query(queryBase, values);
+    }  
+    else{
+        const respuesta = await this.DBClient.query(queryBase);
     }
-    
-        console.log(queryBase);
-        const respuesta = await client.query(queryBase);
-        return respuesta.rows;
+        
+
+        queryBase = `SELECT COUNT(id) FROM events ${mensajeCondicion} GROUP BY id`;
+
+        const totalCount = await this.DBClient.query(queryBase);
+        console.log(totalCount);
+        return [respuesta.rows,totalCount.rows.length];
     }
 
     async getEventById(id) {
-        const query = "SELECT * FROM events e INNER JOIN event_locations el ON e.id_event_location = el.id INNER JOIN locations l ON el.id_location = l.id INNER JOIN provinces p ON l.id_province = p.id WHERE e.id = " + id;
-        const respuesta = await client.query(query);
+        const query = "SELECT * FROM events e INNER JOIN event_locations el ON e.id_event_location = el.id INNER JOIN locations l ON el.id_location = l.id INNER JOIN provinces p ON l.id_province = p.id WHERE e.id = $1";
+        const values = [id];
+        const respuesta = await this.DBClient.query(query, values);
         return respuesta.rows;
     }
 
@@ -93,43 +101,47 @@ export class EventRepository {
             event_enrollments ee 
         INNER JOIN 
             users u on ee.id_user = u.id 
-        WHERE ee.id_event = ${id} ${mensajeCondicion}
+        WHERE ee.id_event = $1 ${mensajeCondicion}
         `
-        const respuesta = await client.query(query);
+        const values = [id];
+        const respuesta = await this.DBClient.query(query, values);
         return respuesta.rows;
     }
 
     async createEvent(event){
-        const query = "INSERT INTO events (name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max_assistance,id_creator_user) VALUES ("+event.name+", "+event.description+", "+event.id_event_category+", "+event.id_event_location+", "+event.start_date+", "+event.duration_in_minutes+", "+event.price+", "+event.enabled_for_enrrolment+", "+event.max_assistance+", "+event.id_creator_user+")";
-        return await client.query(query);
+        const query = "INSERT INTO events (name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max_assistance,id_creator_user) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)";
+        const values = [event.name, event.description, event.id_event_category, event.id_event_location, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrrolment, event.max_assistance, event.id_creator_user];
+        return await this.DBClient.query(query, values);
     }
 
     async updateEvent(id, keys, values){
         const query = "UPDATE events SET "+keys+" = "+values+" WHERE id = "+id;
-        return await client.query(query);
+        return await this.DBClient.query(query);
     }
 
     async deleteEvent(id){
-        const query = "DELETE FROM events WHERE id = "+id;
-        return await client.query(query);
+        const query = "DELETE FROM events WHERE id = $1";
+        const values = [id];
+        return await this.DBClient.query(query, values);
     }
 
     async insertEnrollment(id_event, id_user){
-        const existe = await client.query(("SELECT id FROM event_enrollments WHERE id_event ="+id_event+" AND id_user ="+id_user));
-        const hoy = new Date();
+        const existe = await this.DBClient.query(("SELECT id FROM event_enrollments WHERE id_event = $1 AND id_user = $2"), [id_event, id_user]);
         if(existe == null){
-            const query = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ("+id_event+","+id_user+",null,"+hoy+",null,null,null)";
-            return await client.query(query);
+            const sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
+            const values = [id_event, id_user];
+            return await this.DBClient.query(sql, values);
         }
         return false;
     }
 
     async uploadUserStuff(id_event, id_user, description, attended, observations, rating){
-        const existe = await client.query(("SELECT ee.id, e.start_date FROM event_enrollments ee INNER JOIN events e ON ee.id_event = e.id_event WHERE ee.id_event ="+id_event+" AND ee.id_user ="+id_user));
+        const existe = await this.DBClient.query(("SELECT ee.id, e.start_date FROM event_enrollments ee INNER JOIN events e ON ee.id_event = e.id_event WHERE ee.id_event = $1 AND ee.id_user = $2"), values[id_event, id_user]);
         const hoy = new Date();
         if(existe != null && existe.start_date < hoy){
-            const query = "UPDATE event_enrollments SET description = '"+description+"', attended = "+attended+", observations = '"+observations+"', rating = "+rating+" WHERE id_event = "+id_event+" AND id_user = "+id_user;
-            return await client.query(query);
+            const sql = "UPDATE event_enrollments SET description = $1, attended = $2, observations = $3, rating = $4 WHERE id_event = $5 AND id_user = $6";
+            const values = [description, attended, observations, rating, id_event, id_user];
+            return await this.DBClient.query(sql,values);
         }
         return false;
     }

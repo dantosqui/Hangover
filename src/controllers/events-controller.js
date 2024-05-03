@@ -127,7 +127,7 @@ router.post("/:id/enrollment", async (req, res) => {
         const eventoActualizado = await eventService.uploadUserStuff(id, id_user, description, attended, observations, rating);
         if(eventoActualizado){
             return res.status(232).send({
-                valido: "usuario inscripto correctamente"
+                valido: "enrollment actualizado correctamente"
             });
         }
     }
