@@ -36,7 +36,7 @@ router.get("/:id", async (req, res) => {
     
 });
 
-router.get("/:id/event-location", async (req, res) => {
+router.get("/:id/event_location", async (req, res) => {
     try {
         const location = await LocationService.getLocationById(req.params.id);
         if(location){

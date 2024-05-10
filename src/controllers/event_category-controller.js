@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         const event_category = await eventCategoryService.getEvent_CategoryById(req.params.id);
-        if(event){
+        if(event_category){
             return res.status(200), json(event_category);
         }
         else{
@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-    
+
 });
 
 export default router;

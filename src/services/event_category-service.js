@@ -3,11 +3,11 @@ import { EventCategoryRepository } from "../../repositories/event_category-repos
 
 export class EventCategoryService {
     constructor() {
-        const bd = new EventCategoryRepository();
+        this.bd = new EventCategoryRepository();
     }
 
     async getEvent_Category(limit, offset){
-        const [event_categories,totalCount] = await bd.getEvent_Category(limit, offset, nextPage);
+        const [event_categories,totalCount] = await this.bd.getEvent_Category(limit, offset, nextPage);
         const resultado = {
             
                 collection: event_categories,
@@ -23,7 +23,7 @@ export class EventCategoryService {
     }
 
     async getEvent_CategoryById(id){
-        const resultado = await bd.getEvent_CategoryById(id);
+        const resultado = await this.bd.getEvent_CategoryById(id);
         return resultado;
     }
 

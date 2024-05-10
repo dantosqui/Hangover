@@ -3,11 +3,11 @@ import { ProvinceRepository } from "../../repositories/provinces-repository.js";
 
 export class ProvincesService{
     constructor() {
-        const bd = new ProvinceRepository();
+        this.bd = new ProvinceRepository();
     }
     
     createProvince(name, full_name, latitude, longitude, display_order){
-        const resultado = bd.createProvince(name, full_name, latitude, longitude, display_order);
+        const resultado = this.bd.createProvince(name, full_name, latitude, longitude, display_order);
         if(resultado != null){
             return true;
         }
@@ -16,7 +16,7 @@ export class ProvincesService{
 
     updateProvince(id, province){
 
-        const resultado = bd.updateProvince(id, province);
+        const resultado = this.bd.updateProvince(id, province);
         if(resultado != null){
             return true;
         }
@@ -24,11 +24,11 @@ export class ProvincesService{
     }
 
     deleteProvincia(id){
-        return bd.deleteProvince(id);
+        return this.bd.deleteProvince(id);
     }
 
     getAllProvinces(offset, limit, url){
-        const resultado = bd.getAllProvinces();
+        const resultado = this.bd.getAllProvinces();
         return {
             limit: limit,
             offset: offset,
@@ -37,7 +37,7 @@ export class ProvincesService{
     }
 
     getProvinceById(id){
-        const resultado = bd.getProvinceById(id);
+        const resultado = this.bd.getProvinceById(id);
         return resultado;
     }
 }

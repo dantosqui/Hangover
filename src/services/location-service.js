@@ -1,10 +1,10 @@
 import { query } from "express";
-import { LocationRepository } from "../../repositories/location-repository.js";
+import { LocationRepository } from "../../repositories/locations-repository.js";
 
 export class LocationService {
     constructor() {
-        const bd = new LocationRepository();
+        this.bd = new LocationRepository();
     }
 
-    
+
 }

@@ -33,7 +33,7 @@ export class ProvinceRepository {
     }
 
     async updateProvince(id, province) {
-        const attributes = []
+        const attributes = [];
         
         if(province.name) attributes.push(`name = ${province.name}`);
         if(province.full_name) attributes.push(`full_name = ${province.full_name}`);

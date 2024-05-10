@@ -3,11 +3,11 @@ import { UserRepository } from "../../repositories/users-repository.js";
 
 export class UsersService{
     constructor() {
-        const bd = new UserRepository();
+        this.bd = new UserRepository();
     }
 
     async ValidarUsuario(username, password){
-        const resultado = await bd.getUser(username, password);
+        const resultado = await this.bd.getUser(username, password);
         if(resultado.length > 0){
             return true;
         }
@@ -15,7 +15,7 @@ export class UsersService{
     }
 
     async ValidarRegistro(username){
-        const resultado = await bd.validateUsername(username);
+        const resultado = await this.bd.validateUsername(username);
         if(resultado.length > 0){
             return false;
         }

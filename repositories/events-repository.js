@@ -11,87 +11,76 @@ export class EventRepository {
 
     async getEvent(mensajeCondicion, limit, offset) {
         var queryBase = `
-        SELECT 
-            e.id, 
-            e.name, 
-            e.description, 
-            json_build_object (
-                'id', ec.id,
-                'name', ec.name
-            ) AS event_category,
-            json_build_object (
-                'id', el.id,
-                'name', el.name,
-                'full_address', el.full_address,
-                'latitude', el.latitude,
-                'longitude', el.longitude,
-                'max_capacity', el.max_capacity,
+            SELECT 
+                e.id, 
+                e.name, 
+                e.description, 
+                json_build_object (
+                    'id', ec.id,
+                    'name', ec.name
+                ) AS event_category,
+                json_build_object (
+                    'id', el.id,
+                    'name', el.name,
+                    'full_address', el.full_address,
+                    'latitude', el.latitude,
+                    'longitude', el.longitude,
+                    'max_capacity', el.max_capacity,
+                    'location', json_build_object (
+                        'id', l.id,
+                        'name', l.name,
+                        'latitude', l.latitude,
+                        'longitude', l.longitude,
+                        'max_capacity', el.max_capacity,
+                        'province', json_build_object (
+                            'id', p.id,
+                            'name', p.name,
+                            'full_name', p.full_name,
+                            'latitude', p.latitude,
+                            'longitude', p.longitude,
+                            'display_order', p.display_order
+                        )
+                    )
+                ) AS event_location,
+                e.start_date, 
+                e.duration_in_minutes, 
+                e.price, 
+                e.enabled_for_enrollment, 
+                e.max_assistance, 
+                json_build_object (
+                    'id', u.id,
+                    'username', u.username,
+                    'first_name', u.first_name,
+                    'last_name', u.last_name
+                ) AS creator_user,
                 (
-                    'id', l.id,
-                    'name', l.name,
-                    'latitude', l.latitude,
-                    'longitude', l.longitude,
-                    'max_capacity', l.max_capacity,
-                    (
-                        'id', p.id,
-                        'name', p.name,
-                        'full_name', p.full_name,
-                        'latitude', p.latitude,
-                        'longitude', p.longitude,
-                        'display_order', p.display_order,
-                        
-                    ) AS province
-                ) AS location
-            ) AS event_location,
-            e.start_date, 
-            e.duration_in_minutes, 
-            e.price, 
-            e.enabled_for_enrollment, 
-            e.max_assistance, 
-            json_build_object (
-                'id', u.id,
-                'username', u.username,
-                'first_name', u.first_name,
-                'last_name', u.last_name
-            ) AS creator_user,
-            (
-                SELECT json_agg(t.id, t.name)
-                FROM event_tags et
-                INNER JOIN tags t ON et.id_tag = t.id
-                WHERE et.id_event = e.id
-            ) AS tags
-        FROM 
-            events e 
-        INNER JOIN 
-            event_categories ec ON e.id_event_category = ec.id 
-        LEFT JOIN 
-            event_tags et ON et.id_event = e.id 
-        INNER JOIN 
-            tags t ON et.id_tag = t.id
-		INNER JOIN
-			users u ON e.id_creator_user = u.id
-		INNER JOIN 
-            event_locations el ON e.id_event_location = el.id
-        INNER JOIN
-            locations l ON el.id_location = l.id
-        INNER JOIN
-            provinces p ON l.id_province = p.id
-        ${mensajeCondicion} 
-    `;
-    if (limit !== null && limit !== undefined && limit !== 0) {
-        queryBase += ` LIMIT = $1`;
-        const values = [limit];
-        if (offset !== null && offset !== undefined) {
-            queryBase += ` OFFSET = $2`;
-            values = [limit, offset];
-        }
-        const respuesta = await this.DBClient.query(queryBase, values);
-    }  
-    else{
-        const respuesta = await this.DBClient.query(queryBase);
-    }
-        
+                    SELECT json_agg(json_build_object('id', t.id, 'name', t.name))
+                    FROM event_tags et
+                    INNER JOIN tags t ON et.id_tag = t.id
+                    WHERE et.id_event = e.id
+                ) AS tags
+            FROM 
+                events e 
+            INNER JOIN 
+                event_categories ec ON e.id_event_category = ec.id 
+            LEFT JOIN 
+                event_locations el ON e.id_event_location = el.id
+            INNER JOIN
+                locations l ON el.id_location = l.id
+            INNER JOIN
+                provinces p ON l.id_province = p.id
+            INNER JOIN
+                users u ON e.id_creator_user = u.id
+            ${mensajeCondicion}
+            LIMIT $1
+            OFFSET $2;
+        `;
 
+    
+        const values = [limit, offset];
+        const respuesta = await this.DBClient.query(queryBase, values);
+        
+        
         queryBase = `SELECT COUNT(id) FROM events ${mensajeCondicion} GROUP BY id`;
 
         const totalCount = await this.DBClient.query(queryBase);
@@ -122,17 +111,10 @@ export class EventRepository {
         INNER JOIN 
             users u on ee.id_user = u.id 
         WHERE ee.id_event = $1 ${mensajeCondicion}
+        LIMIT = $2
+        OFFSET = $3
         `
-        const values = [id];
-
-        if (limit !== null && limit !== undefined && limit !== 0) {
-            query += ` LIMIT = $2`;
-            values.push(limit);
-            if (offset !== null && offset !== undefined) {
-                queryBase += ` OFFSET = $3`;
-                values.push(offset);
-            }
-        }
+        const values = [id, limit, offset];
 
         const respuesta = await this.DBClient.query(query, values);
 

@@ -6,20 +6,16 @@ const router = express.Router();
 const eventService = new EventsService();
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit ?? null;
-    const offset = req.query.offset ?? 1;
+    const limit = req.query.limit;
+    const offset = req.query.offset;
     const tag = req.query.tag;
     const startDate = req.query.startDate;
     const name = req.query.name;
     const category = req.query.category;
 
-    const nextPage = req.originalUrl.replace(/(offset=)\d+/, 'offset=' + (parseInt(offset) + 1));
-    console.log(nextPage);
 
     try{
-        const allEvents = await eventService.getEvent(offset, limit, tag, startDate, name, category, nextPage);
-        //allEvents.pagination.offset = allEvents.pagination.offset +1;
-
+        const allEvents = await eventService.getEvent(offset, limit, tag, startDate, name, category, req.originalUrl);
         console.log("Estoy en el controller: ", allEvents)
         return res.json(allEvents);
     }catch(error){ 
@@ -41,8 +37,8 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/enrollment", async (req, res) => {
-    const limit = req.query.limit ?? null;
-    const offset = req.query.offset ?? 1;
+    const limit = req.query.limit;
+    const offset = req.query.offset;
     const first_name = req.query.first_name;
     const last_name = req.query.last_name;
     const username = req.query.username;
@@ -50,7 +46,7 @@ router.get("/:id/enrollment", async (req, res) => {
     const rating = req.query.rating;
 
     try {
-        const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating, limit, offset);
+        const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating, limit, offset, req.originalUrl);
         if(participants){
             return res.json(participants);
         }
