@@ -41,6 +41,8 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/enrollment", async (req, res) => {
+    const limit = req.query.limit ?? null;
+    const offset = req.query.offset ?? 1;
     const first_name = req.query.first_name;
     const last_name = req.query.last_name;
     const username = req.query.username;
@@ -48,7 +50,7 @@ router.get("/:id/enrollment", async (req, res) => {
     const rating = req.query.rating;
 
     try {
-        const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating);
+        const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating, limit, offset);
         if(participants){
             return res.json(participants);
         }

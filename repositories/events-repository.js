@@ -15,23 +15,6 @@ export class EventRepository {
             e.id, 
             e.name, 
             e.description, 
-            e.start_date, 
-            e.duration_in_minutes, 
-            e.price, 
-            e.enabled_for_enrollment, 
-            e.max_assistance, 
-            (
-                SELECT json_agg(t.name)
-                FROM event_tags et
-                INNER JOIN tags t ON et.id_tag = t.id
-                WHERE et.id_event = e.id
-            ) AS tags,
-            json_build_object (
-                'id', u.id,
-                'username', u.username,
-                'first_name', u.first_name,
-                'last_name', u.last_name
-            ) AS creator_user,
             json_build_object (
                 'id', ec.id,
                 'name', ec.name
@@ -42,8 +25,41 @@ export class EventRepository {
                 'full_address', el.full_address,
                 'latitude', el.latitude,
                 'longitude', el.longitude,
-                'max_capacity', el.max_capacity
-            ) AS event_location
+                'max_capacity', el.max_capacity,
+                (
+                    'id', l.id,
+                    'name', l.name,
+                    'latitude', l.latitude,
+                    'longitude', l.longitude,
+                    'max_capacity', l.max_capacity,
+                    (
+                        'id', p.id,
+                        'name', p.name,
+                        'full_name', p.full_name,
+                        'latitude', p.latitude,
+                        'longitude', p.longitude,
+                        'display_order', p.display_order,
+                        
+                    ) AS province
+                ) AS location
+            ) AS event_location,
+            e.start_date, 
+            e.duration_in_minutes, 
+            e.price, 
+            e.enabled_for_enrollment, 
+            e.max_assistance, 
+            json_build_object (
+                'id', u.id,
+                'username', u.username,
+                'first_name', u.first_name,
+                'last_name', u.last_name
+            ) AS creator_user,
+            (
+                SELECT json_agg(t.id, t.name)
+                FROM event_tags et
+                INNER JOIN tags t ON et.id_tag = t.id
+                WHERE et.id_event = e.id
+            ) AS tags
         FROM 
             events e 
         INNER JOIN 
@@ -54,12 +70,17 @@ export class EventRepository {
             tags t ON et.id_tag = t.id
 		INNER JOIN
 			users u ON e.id_creator_user = u.id
-		INNER JOIN event_locations el ON e.id_event_location = el.id
+		INNER JOIN 
+            event_locations el ON e.id_event_location = el.id
+        INNER JOIN
+            locations l ON el.id_location = l.id
+        INNER JOIN
+            provinces p ON l.id_province = p.id
         ${mensajeCondicion} 
     `;
     if (limit !== null && limit !== undefined && limit !== 0) {
         queryBase += ` LIMIT = $1`;
-        values = [limit];
+        const values = [limit];
         if (offset !== null && offset !== undefined) {
             queryBase += ` OFFSET = $2`;
             values = [limit, offset];
@@ -74,7 +95,6 @@ export class EventRepository {
         queryBase = `SELECT COUNT(id) FROM events ${mensajeCondicion} GROUP BY id`;
 
         const totalCount = await this.DBClient.query(queryBase);
-        console.log(totalCount);
         return [respuesta.rows,totalCount.rows.length];
     }
 
@@ -85,7 +105,7 @@ export class EventRepository {
         return respuesta.rows;
     }
 
-    async getParticipantEvent(id, mensajeCondicion){
+    async getParticipantEvent(id, mensajeCondicion, limit, offset){
         const query = `
         SELECT 
             json_build_object (
@@ -104,8 +124,22 @@ export class EventRepository {
         WHERE ee.id_event = $1 ${mensajeCondicion}
         `
         const values = [id];
+
+        if (limit !== null && limit !== undefined && limit !== 0) {
+            query += ` LIMIT = $2`;
+            values.push(limit);
+            if (offset !== null && offset !== undefined) {
+                queryBase += ` OFFSET = $3`;
+                values.push(offset);
+            }
+        }
+
         const respuesta = await this.DBClient.query(query, values);
-        return respuesta.rows;
+
+        query = `SELECT COUNT(id) FROM event_enrollments WHERE id_event = $1 ${mensajeCondicion} GROUP BY id`;
+
+        const totalCount = await this.DBClient.query(query);
+        return [respuesta.rows,totalCount.rows.length];
     }
 
     async createEvent(event){

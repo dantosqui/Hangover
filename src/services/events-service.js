@@ -64,7 +64,7 @@ export class EventsService {
         return resultado;
     }
 
-    async getParticipantEvent(id, first_name, last_name, username, attended, rating){
+    async getParticipantEvent(id, first_name, last_name, username, attended, rating, limit, offset){
         console.log(attended);
         if(typeof attended !== "undefined" && attended != "true" && attended != "false") {
             return false;
@@ -90,17 +90,18 @@ export class EventsService {
             mensajeCondicion += ` AND ee.rating = ${rating}`;
         }
 
-        const participants = await bd.getParticipantEvent(id, mensajeCondicion);
+
+        const [participants,totalCount] = await bd.getParticipantEvent(id, mensajeCondicion, limit, offset);
         const resultado = {
-        
-            collection: participants,
-            pagination:
-                {
-                    limit: limit,
-                    offset: offset,
-                    nextPage: `http://localhost:3508${nextPage}`,
-                    total: eventos.length
-                }
+            
+                collection: participants,
+                pagination:
+                    {
+                        limit: limit,
+                        offset: offset,
+                        nextPage: (((offset+1)*limit <= totalCount) ? `${process.env.DB_USER}${nextPage}`:null),
+                        total: totalCount
+                    }
         };
         return resultado;
     }
