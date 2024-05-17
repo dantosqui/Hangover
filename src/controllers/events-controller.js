@@ -16,7 +16,6 @@ router.get("/", async (req, res) => {
 
     try{
         const allEvents = await eventService.getEvent(offset, limit, tag, startDate, name, category, req.originalUrl);
-        console.log("Estoy en el controller: ", allEvents)
         return res.json(allEvents);
     }catch(error){ 
         console.log("Error al buscar");

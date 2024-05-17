@@ -9,74 +9,80 @@ export class EventRepository {
         this.DBClient.connect();
     }
 
-    async getEvent(mensajeCondicion, limit, offset) {
-        var queryBase = `
-            SELECT 
-                e.id, 
-                e.name, 
-                e.description, 
-                json_build_object (
-                    'id', ec.id,
-                    'name', ec.name
-                ) AS event_category,
-                json_build_object (
-                    'id', el.id,
-                    'name', el.name,
-                    'full_address', el.full_address,
-                    'latitude', el.latitude,
-                    'longitude', el.longitude,
+    queryTraerEvento(){
+        const query = `
+        SELECT 
+            e.id, 
+            e.name, 
+            e.description, 
+            json_build_object (
+                'id', ec.id,
+                'name', ec.name
+            ) AS event_category,
+            json_build_object (
+                'id', el.id,
+                'name', el.name,
+                'full_address', el.full_address,
+                'latitude', el.latitude,
+                'longitude', el.longitude,
+                'max_capacity', el.max_capacity,
+                'location', json_build_object (
+                    'id', l.id,
+                    'name', l.name,
+                    'latitude', l.latitude,
+                    'longitude', l.longitude,
                     'max_capacity', el.max_capacity,
-                    'location', json_build_object (
-                        'id', l.id,
-                        'name', l.name,
-                        'latitude', l.latitude,
-                        'longitude', l.longitude,
-                        'max_capacity', el.max_capacity,
-                        'province', json_build_object (
-                            'id', p.id,
-                            'name', p.name,
-                            'full_name', p.full_name,
-                            'latitude', p.latitude,
-                            'longitude', p.longitude,
-                            'display_order', p.display_order
-                        )
+                    'province', json_build_object (
+                        'id', p.id,
+                        'name', p.name,
+                        'full_name', p.full_name,
+                        'latitude', p.latitude,
+                        'longitude', p.longitude,
+                        'display_order', p.display_order
                     )
-                ) AS event_location,
-                e.start_date, 
-                e.duration_in_minutes, 
-                e.price, 
-                e.enabled_for_enrollment, 
-                e.max_assistance, 
-                json_build_object (
-                    'id', u.id,
-                    'username', u.username,
-                    'first_name', u.first_name,
-                    'last_name', u.last_name
-                ) AS creator_user,
-                (
-                    SELECT json_agg(json_build_object('id', t.id, 'name', t.name))
-                    FROM event_tags et
-                    INNER JOIN tags t ON et.id_tag = t.id
-                    WHERE et.id_event = e.id
-                ) AS tags
-            FROM 
-                events e 
-            INNER JOIN 
-                event_categories ec ON e.id_event_category = ec.id 
-            LEFT JOIN 
-                event_locations el ON e.id_event_location = el.id
-            INNER JOIN
-                locations l ON el.id_location = l.id
-            INNER JOIN
-                provinces p ON l.id_province = p.id
-            INNER JOIN
-                users u ON e.id_creator_user = u.id
+                )
+            ) AS event_location,
+            e.start_date, 
+            e.duration_in_minutes, 
+            e.price, 
+            e.enabled_for_enrollment, 
+            e.max_assistance, 
+            json_build_object (
+                'id', u.id,
+                'username', u.username,
+                'first_name', u.first_name,
+                'last_name', u.last_name
+            ) AS creator_user,
+            (
+                SELECT json_agg(json_build_object('id', t.id, 'name', t.name))
+                FROM event_tags et
+                INNER JOIN tags t ON et.id_tag = t.id
+                WHERE et.id_event = e.id
+            ) AS tags
+        FROM 
+            events e 
+        INNER JOIN 
+            event_categories ec ON e.id_event_category = ec.id 
+        LEFT JOIN 
+            event_locations el ON e.id_event_location = el.id
+        INNER JOIN
+            locations l ON el.id_location = l.id
+        INNER JOIN
+            provinces p ON l.id_province = p.id
+        INNER JOIN
+            users u ON e.id_creator_user = u.id
+        `;
+        return query;
+    }
+
+    async getEvent(mensajeCondicion, limit, offset) {
+        var queryBase = this.queryTraerEvento() + `
             ${mensajeCondicion}
             LIMIT $1
             OFFSET $2;
         `;
 
-    
+        console.log(queryBase);
         const values = [limit, offset];
         const respuesta = await this.DBClient.query(queryBase, values);
         
@@ -88,7 +94,7 @@ export class EventRepository {
     }
 
     async getEventById(id) {
-        const query = "SELECT * FROM events e INNER JOIN event_locations el ON e.id_event_location = el.id INNER JOIN locations l ON el.id_location = l.id INNER JOIN provinces p ON l.id_province = p.id WHERE e.id = $1";
+        const query = queryTraerEvento() + " WHERE e.id = $1";
         const values = [id];
         const respuesta = await this.DBClient.query(query, values);
         return respuesta.rows;

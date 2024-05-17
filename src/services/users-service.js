@@ -8,10 +8,7 @@ export class UsersService{
 
     async ValidarUsuario(username, password){
         const resultado = await this.bd.getUser(username, password);
-        if(resultado.length > 0){
-            return true;
-        }
-        return false;
+        return resultado;
     }
 
     async ValidarRegistro(username){
