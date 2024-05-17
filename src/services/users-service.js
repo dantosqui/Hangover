@@ -11,11 +11,8 @@ export class UsersService{
         return resultado;
     }
 
-    async ValidarRegistro(username){
-        const resultado = await this.bd.validateUsername(username);
-        if(resultado.length > 0){
-            return false;
-        }
-        return true;
+    async ValidarRegistro(user){
+        const resultado = await this.bd.validateUsername(user);
+        return resultado;
     }
 }

@@ -1,6 +1,6 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
-import { createToken } from "../src/jwt.js";
+import { createToken } from "../src/auth/jwt.js";
 
 
 export class UserRepository {
@@ -29,18 +29,22 @@ export class UserRepository {
         }
     }
 
-    async validateUsername(username){
+    async validateUsername(user){
         try {
-            const query = "SELECT * FROM users WHERE username = $1";
-            const values = [`'${username}'`];
-            const respuesta = await this.DBClient.query(query, values);
-            if(respuesta.rows.length = 0){
-                return respuesta.rows;
+            var query = "SELECT * FROM users WHERE username = $1";
+            var values = [user.username];
+            var respuesta = await this.DBClient.query(query, values);
+            console.log(respuesta.rows);
+            if(respuesta.rows.length == 0){
+                query = "INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)";
+                values = [user.first_name, user.last_name, user.username, user.password];
+                respuesta = await this.DBClient.query(query, values);
+                return respuesta;
             }
+            return false;
         }
         catch(error){
             console.log(error);
         }
-        return true;
     }
 }

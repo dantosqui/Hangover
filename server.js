@@ -11,7 +11,7 @@ const port = 3508;
 
 app.use("/api/event", EventsController);
 app.use("/api/user", UsersController);
-app.use("/api/provinces", ProvincesController); 
+app.use("/api/province", ProvincesController); 
 app.use("/api/event-category", EventCategoryController); 
 app.use("/api/location", LocationController); 
 

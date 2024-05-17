@@ -61,8 +61,8 @@ router.get("/", async (req, res) => {
     const offset = req.query.offset;
 
     try{
-        const provinces = await provinceService.getAllProvinces(offset, limit, req.url);
-        return res.json(provinces);
+        const provinces = await provinceService.getAllProvinces(limit, offset, req.originalUrl);
+        return res.status(200).json(provinces);
     }catch(error){ 
         return res.json("Un Error");
     }
@@ -71,7 +71,26 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         const province = await provinceService.getProvinceById(req.params.id);
-        return res.json(province);
+        if(province.length > 0){
+            return res.status(200).json(province);
+        }else{
+            return res.status(404).send();
+        }
+    }
+    catch(error){
+        console.log("Error al buscar");
+        return res.json("Un Error");
+    }
+});
+
+router.get("/:id/locations", async (req, res) => {
+    try {
+        const locations = await provinceService.getLocationsByProvinceId(req.params.id);
+        if(locations.length > 0){
+            return res.status(200).json(locations);
+        }else{
+            return res.status(404).send();
+        }
     }
     catch(error){
         console.log("Error al buscar");

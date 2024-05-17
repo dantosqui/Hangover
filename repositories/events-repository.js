@@ -83,7 +83,7 @@ export class EventRepository {
         `;
 
         console.log(queryBase);
-        const values = [limit, offset];
+        const values = [limit, offset*limit];
         const respuesta = await this.DBClient.query(queryBase, values);
         
         
@@ -120,7 +120,7 @@ export class EventRepository {
         LIMIT = $2
         OFFSET = $3
         `
-        const values = [id, limit, offset];
+        const values = [id, limit, offset*limit];
 
         const respuesta = await this.DBClient.query(query, values);
 

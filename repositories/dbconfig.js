@@ -1,6 +1,5 @@
 import 'dotenv/config'
 
-console.log(process.env.DB_USER);
 export const DBConfig = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

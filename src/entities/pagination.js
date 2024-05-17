@@ -5,9 +5,14 @@ export class Pagination {
             pagination: {
                 limit: limit, 
                 offset: offset,
-                nextPage: (offset+1)*limit < total ? (!url.includes("offset") ? (url.includes("limit") ? url.concat("&offset=" + (offset+1)) : url.concat("offset=" + (offset+1))): `${process.env.BASE_URL}${url.replace(/(offset=)\d+/, 'offset=' + (parseInt(offset) + 1))}`):null,
+                nextPage: (parseInt(offset) + 1)*limit < total ? 
+                    (!url.includes("offset") ? 
+                        (url.includes("limit") ? url.concat("&offset=" + (offset+1)) : url.concat("?offset=" + (offset+1)))
+                            : `${process.env.BASE_URL}${url.replace(/(offset=)\d+/, 'offset=' + (parseInt(offset) + 1))}`)
+                    :null,
                 total: total
             }
+
 
             //offset+1*limit menor / menor o igual al total?
         };

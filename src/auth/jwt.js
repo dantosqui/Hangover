@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import 'dotenv/config'
 
 export const createToken = (user) => {
     const payload = {
@@ -6,7 +7,7 @@ export const createToken = (user) => {
         username: user[0].username
     };
 
-    const secretKey = user[0].password;
+    const secretKey = process.env.SECRET_KEY;
 
     const options = {
         expiresIn : '1h',
@@ -16,8 +17,8 @@ export const createToken = (user) => {
     return jwt.sign(payload,secretKey,options);
 }
 
-export const desencryptToken = (password, encryptedToken) => {
-    const secretKey = password;
+export const decryptToken = (encryptedToken) => {
+    const secretKey = process.env.SECRET_KEY;
     let token = encryptedToken;
     let payloadOriginal = null;
 

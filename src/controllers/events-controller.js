@@ -1,11 +1,12 @@
 import express from "express";
 import {EventsService} from "../services/events-service.js";
+import { AuthMiddleware } from "../auth/authMiddleware.js";
 
 
 const router = express.Router();
 const eventService = new EventsService();
 
-router.get("/", async (req, res) => {
+router.get("/", AuthMiddleware, async (req, res) => {
     const limit = req.query.limit;
     const offset = req.query.offset;
     const tag = req.query.tag;
@@ -27,7 +28,12 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         const event = await eventService.getEventById(req.params.id);
-        return res.json(event);
+        if(event){
+            return res.status(200).json(event);
+        }
+        else{
+            return res.status(404).send();
+        }
     }
     catch(error){
         console.log("Error al buscar");

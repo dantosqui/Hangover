@@ -46,27 +46,36 @@ export class ProvinceRepository {
         return await this.DBClient.query(sql,values);
     }
 
-    async getAllProvinces(pageSize, requestedPage) {
-        const sql = "SELECT * FROM provinces limit = $1 offset = $2";
-        const values = [pageSize, requestedPage];
-        return await this.DBClient.query(sql, values);
-    }
+    async getAllProvinces(limit, offset) {
+        var sql = "SELECT * FROM provinces limit $1 offset $2";
+        const values = [limit, offset*limit];
+        const respuesta = await this.DBClient.query(sql, values);
+
+    
+        sql = `SELECT COUNT(id) FROM provinces GROUP BY id`;
+        const totalCount = await this.DBClient.query(sql);
+
+        return [respuesta.rows,totalCount.rows.length];
+    }   
 
     async getProvinceById(id) {
         try {
             const sql = "SELECT * FROM provinces WHERE id = $1";
             const values = [id];
             const respuesta = await this.DBClient.query(sql, values);
-            if(respuesta.rows.length > 0){
-                return respuesta.rows;
-            }
-            else{
-                return false;
-            }
-            
+            return respuesta.rows;
         }
         catch(error){
             console.log(error);
         }
+    }
+
+    async getLocationsByProvince(id) {
+        const sql = "SELECT id, name, id_province, latitude, longitude FROM locations WHERE id_province = $1";
+        const values = [id];
+        const respuesta = await this.DBClient.query(sql, values);
+        return respuesta.rows;
+
+        //falta paginacion
     }
 }

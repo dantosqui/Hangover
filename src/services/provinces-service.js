@@ -1,5 +1,6 @@
 import { query } from "express";
 import { ProvinceRepository } from "../../repositories/provinces-repository.js";
+import { Pagination } from "../entities/pagination.js"
 
 export class ProvincesService{
     constructor() {
@@ -27,17 +28,20 @@ export class ProvincesService{
         return this.bd.deleteProvince(id);
     }
 
-    getAllProvinces(offset, limit, url){
-        const resultado = this.bd.getAllProvinces();
-        return {
-            limit: limit,
-            offset: offset,
-            nextPage: `http://localhost:3508/${url}?limit=${pageSize}&offset=${requestedPage+1}`
-        };
+    async getAllProvinces(limit, offset, url){
+        limit = Pagination.ParseLimit(limit);
+        offset = Pagination.ParseOffset(offset);
+        const [provinces,totalCount] = await this.bd.getAllProvinces(limit, offset);
+        return Pagination.BuildPagination(provinces, limit, offset, url, totalCount);
     }
 
-    getProvinceById(id){
-        const resultado = this.bd.getProvinceById(id);
+    async getProvinceById(id){
+        const resultado = await this.bd.getProvinceById(id);
+        return resultado;
+    }
+
+    async getLocationsByProvinceId(id){
+        const resultado = await this.bd.getLocationsByProvince(id);
         return resultado;
     }
 }
