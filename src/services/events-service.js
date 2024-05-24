@@ -7,10 +7,11 @@ export class EventsService {
         this.bd = new EventRepository();
     }
 
-    async getEvent(offset, limit, tag, startDate, name, category, url){
+    async getEvent(offset, limit, tag, start_date, name, category, url){
 
-        const regexFecha = /^\d{4}-\d{2}-\d{2}$/;
-        if(typeof startDate !== "undefined" && regexFecha.test(startDate)){
+        const regexFecha = /^\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2}:\d{2})?$/;
+
+        if(typeof start_date !== "undefined" && !regexFecha.test(start_date)){
             return false;
         }
         var mensajeCondicion = "";
@@ -28,12 +29,12 @@ export class EventsService {
             }
         }
 
-        if (startDate){
+        if (start_date){
             if(mensajeCondicion.includes("WHERE")){
-                mensajeCondicion += ` AND e.startDate = '${startDate}'`;
+                mensajeCondicion += ` AND e.start_date >= '${start_date}'`;
             }
             else{
-                mensajeCondicion += ` WHERE e.startDate = '${startDate}'`;
+                mensajeCondicion += ` WHERE e.start_date >= '${start_date}'`;
             }
         }
 
@@ -58,7 +59,6 @@ export class EventsService {
     }
 
     async getParticipantEvent(id, first_name, last_name, username, attended, rating, limit, offset, url){
-        console.log(attended);
         if(typeof attended !== "undefined" && attended != "true" && attended != "false") {
             return false;
         }
@@ -86,8 +86,8 @@ export class EventsService {
         limit = Pagination.ParseLimit(limit);
         offset = Pagination.ParseOffset(offset);
         const [participants,totalCount] = await this.bd.getParticipantEvent(id, mensajeCondicion, limit, offset);
-        const resultado = new Pagination(participants, limit, offset, url, totalCount);
-        return resultado;
+        
+        return Pagination.BuildPagination(participants, limit, offset, url, totalCount);
     }
 
     async createEvent(event){

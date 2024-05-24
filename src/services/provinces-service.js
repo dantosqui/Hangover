@@ -7,12 +7,16 @@ export class ProvincesService{
         this.bd = new ProvinceRepository();
     }
     
-    createProvince(name, full_name, latitude, longitude, display_order){
-        const resultado = this.bd.createProvince(name, full_name, latitude, longitude, display_order);
-        if(resultado != null){
-            return true;
+    createProvince(province){
+        console.log(province);
+        console.log(province.latitude);
+        if(province.name.length <= 3 || isNaN(province.latitude) || isNaN(province.longitude)){
+            return false;
         }
-        return false;
+        else{
+            const resultado = this.bd.createProvince(province);
+            return resultado;
+        }
     }
 
     updateProvince(id, province){
@@ -40,8 +44,10 @@ export class ProvincesService{
         return resultado;
     }
 
-    async getLocationsByProvinceId(id){
-        const resultado = await this.bd.getLocationsByProvince(id);
-        return resultado;
+    async getLocationsByProvinceId(limit, offset, url, id){
+        limit = Pagination.ParseLimit(limit);
+        offset = Pagination.ParseOffset(offset);
+        const [locations,totalCount] = await this.bd.getLocationsByProvince(limit, offset, id);
+        return Pagination.BuildPagination(locations, limit, offset, url, totalCount);
     }
 }

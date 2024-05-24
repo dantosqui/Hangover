@@ -71,6 +71,10 @@ export class EventRepository {
             provinces p ON l.id_province = p.id
         INNER JOIN
             users u ON e.id_creator_user = u.id
+        INNER JOIN 
+            event_tags et on et.id_event = e.id
+        INNER JOIN
+            tags t on et.id_tag = t.id
         `;
         return query;
     }
@@ -81,27 +85,40 @@ export class EventRepository {
             LIMIT $1
             OFFSET $2;
         `;
-
-        console.log(queryBase);
         const values = [limit, offset*limit];
         const respuesta = await this.DBClient.query(queryBase, values);
-        
-        
-        queryBase = `SELECT COUNT(id) FROM events ${mensajeCondicion} GROUP BY id`;
+
+        queryBase = `SELECT COUNT(e.id) FROM events e 
+        INNER JOIN 
+            event_categories ec ON e.id_event_category = ec.id 
+        LEFT JOIN 
+            event_locations el ON e.id_event_location = el.id
+        INNER JOIN
+            locations l ON el.id_location = l.id
+        INNER JOIN
+            provinces p ON l.id_province = p.id
+        INNER JOIN
+            users u ON e.id_creator_user = u.id
+        INNER JOIN 
+            event_tags et on et.id_event = e.id
+        INNER JOIN
+            tags t on et.id_tag = t.id
+        ${mensajeCondicion} GROUP BY e.id`;
 
         const totalCount = await this.DBClient.query(queryBase);
+
         return [respuesta.rows,totalCount.rows.length];
     }
 
     async getEventById(id) {
-        const query = queryTraerEvento() + " WHERE e.id = $1";
+        const query = this.queryTraerEvento() + " WHERE e.id = $1";
         const values = [id];
         const respuesta = await this.DBClient.query(query, values);
         return respuesta.rows;
     }
 
     async getParticipantEvent(id, mensajeCondicion, limit, offset){
-        const query = `
+        var query = `
         SELECT 
             json_build_object (
                 'id', u.id,
@@ -117,16 +134,17 @@ export class EventRepository {
         INNER JOIN 
             users u on ee.id_user = u.id 
         WHERE ee.id_event = $1 ${mensajeCondicion}
-        LIMIT = $2
-        OFFSET = $3
+        LIMIT $2
+        OFFSET $3
         `
-        const values = [id, limit, offset*limit];
+        
+        var values = [id, limit, offset*limit];
 
         const respuesta = await this.DBClient.query(query, values);
+        query = `SELECT COUNT(ee.id) FROM event_enrollments ee INNER JOIN users u ON ee.id_user = u.id WHERE id_event = $1 ${mensajeCondicion} GROUP BY ee.id`;
+        values=[id];   
 
-        query = `SELECT COUNT(id) FROM event_enrollments WHERE id_event = $1 ${mensajeCondicion} GROUP BY id`;
-
-        const totalCount = await this.DBClient.query(query);
+        const totalCount = await this.DBClient.query(query,values);
         return [respuesta.rows,totalCount.rows.length];
     }
 

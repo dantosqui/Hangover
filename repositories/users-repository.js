@@ -39,7 +39,8 @@ export class UserRepository {
                 query = "INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)";
                 values = [user.first_name, user.last_name, user.username, user.password];
                 respuesta = await this.DBClient.query(query, values);
-                return respuesta;
+                console.log("hola");
+                return true;
             }
             return false;
         }

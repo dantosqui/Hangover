@@ -13,17 +13,16 @@ export class ProvinceRepository {
     async createProvince(province) {
         try {
             const sql = "INSERT INTO provinces (name, full_name, latitude, longitude, display_order) VALUES ($1, $2, $3, $4, $5)"; 
-            const values = [province.name, province.full_name, province.latitude, province.longitude, province.display_order];
+            const values = [province.name, province.full_name, province.latitude, province.longitude, province.display_order? province.display_order : null];
             const respuesta = await this.DBClient.query(sql, values);
             if(respuesta.rows.length > 0){
                 return true;
+            }else{
+                return false;
             }
-            return respuesta.rows;
         } catch (error) {
             console.log(error);
         }
-        
-        return false;
     }
 
     async deleteProvince(id) {
@@ -70,11 +69,15 @@ export class ProvinceRepository {
         }
     }
 
-    async getLocationsByProvince(id) {
-        const sql = "SELECT id, name, id_province, latitude, longitude FROM locations WHERE id_province = $1";
-        const values = [id];
+    async getLocationsByProvince(limit,offset,id) {
+        var sql = "SELECT id, name, id_province, latitude, longitude FROM locations WHERE id_province = $1 LIMIT $2 OFFSET $3";
+        var values = [id, limit, offset*limit];
         const respuesta = await this.DBClient.query(sql, values);
-        return respuesta.rows;
+        sql = `SELECT COUNT(id) FROM locations WHERE id_province = $1 GROUP BY id`;
+        values=[id];
+        const totalCount = await this.DBClient.query(sql, values);
+
+        return [respuesta.rows,totalCount.rows.length];
 
         //falta paginacion
     }

@@ -1,10 +1,11 @@
 import express from "express";
 import {LocationService} from "../services/location-service.js";
+import { AuthMiddleware } from "../auth/authMiddleware.js";
 
 const router = express.Router();
 const locationService = new LocationService();
 
-router.get("/", async (req, res) => {
+router.get("/", AuthMiddleware, async (req, res) => {
     const limit = req.query.limit ?? null;
     const offset = req.query.offset ?? 1;
 
@@ -20,7 +21,7 @@ router.get("/", async (req, res) => {
     
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", AuthMiddleware, async (req, res) => {
     try {
         const location = await LocationService.getLocationById(req.params.id);
         if(location){
@@ -36,7 +37,7 @@ router.get("/:id", async (req, res) => {
     
 });
 
-router.get("/:id/event_location", async (req, res) => {
+router.get("/:id/event_location", AuthMiddleware, async (req, res) => {
     try {
         const location = await LocationService.getLocationById(req.params.id);
         if(location){

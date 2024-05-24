@@ -10,14 +10,20 @@ router.get("/", AuthMiddleware, async (req, res) => {
     const limit = req.query.limit;
     const offset = req.query.offset;
     const tag = req.query.tag;
-    const startDate = req.query.startDate;
+    const start_date = req.query.startdate;
     const name = req.query.name;
     const category = req.query.category;
 
 
     try{
-        const allEvents = await eventService.getEvent(offset, limit, tag, startDate, name, category, req.originalUrl);
-        return res.json(allEvents);
+        const allEvents = await eventService.getEvent(offset, limit, tag, start_date, name, category, req.originalUrl);
+        if(allEvents){
+            return res.json(allEvents);
+        }
+        else{
+            return res.status(400).send();
+        }
+        
     }catch(error){ 
         console.log("Error al buscar");
         return res.json("Un Error");
@@ -25,7 +31,7 @@ router.get("/", AuthMiddleware, async (req, res) => {
     
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", AuthMiddleware, async (req, res) => {
     try {
         const event = await eventService.getEventById(req.params.id);
         if(event){
@@ -41,7 +47,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-router.get("/:id/enrollment", async (req, res) => {
+router.get("/:id/enrollment", AuthMiddleware, async (req, res) => {
     const limit = req.query.limit;
     const offset = req.query.offset;
     const first_name = req.query.first_name;
@@ -49,9 +55,9 @@ router.get("/:id/enrollment", async (req, res) => {
     const username = req.query.username;
     const attended = req.query.attended;
     const rating = req.query.rating;
-
     try {
         const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating, limit, offset, req.originalUrl);
+        console.log(participants);
         if(participants){
             return res.json(participants);
         }
@@ -62,13 +68,12 @@ router.get("/:id/enrollment", async (req, res) => {
     }
     catch(error){
         console.log(error);
-        console.log("hola");
         console.log("Error al buscar");
         return res.json("Un Error");
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", AuthMiddleware, async (req, res) => {
     const event = new Event();
     event = {
         name: req.body.name,
@@ -86,7 +91,7 @@ router.post("/", async (req, res) => {
     if(event){
         const eventoCreado = await eventService.createEvent(event);
         if(eventoCreado){
-            return res.status(232).send({
+            return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
                 valido: "evento creado correctamente",
             });
         }
@@ -94,7 +99,7 @@ router.post("/", async (req, res) => {
     return res.status(400).send("Error en los campos");
 });
 
-router.patch( "/:id", async (req,res) =>{
+router.patch( "/:id", AuthMiddleware, async (req,res) =>{
     const id=req.params.id;
 
     const event = new Event();
@@ -111,7 +116,7 @@ router.patch( "/:id", async (req,res) =>{
 
         const eventoActualizado = await eventService.updateEvent(id, event)
         if(eventoActualizado){
-            return res.status(232).send({
+            return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
                 valido: "evento actualizado correctamente"
             });
         }
@@ -119,18 +124,18 @@ router.patch( "/:id", async (req,res) =>{
     return res.status(400).send("Error en los campos");
 });
 
-router.delete( "/:id", async (req,res) =>{
+router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     const id=req.params.id;
     const eventoEliminado = await eventService.deleteEvent(id);
     if(eventoEliminado){
-        return res.status(232).send({
+        return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
             valido: "evento eliminado correctamente"
         });
     }
     return res.status(400).send("Error en los campos");
 });
 
-router.post("/:id/enrollment", async (req, res) => {
+router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
     const id=req.params.id;
     const description = req.query.description;
     const attended = req.query.attended;
@@ -141,7 +146,7 @@ router.post("/:id/enrollment", async (req, res) => {
     if(id_user && description && attended && observations && rating){
         const eventoActualizado = await eventService.uploadUserStuff(id, id_user, description, attended, observations, rating);
         if(eventoActualizado){
-            return res.status(232).send({
+            return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
                 valido: "enrollment actualizado correctamente"
             });
         }
@@ -149,7 +154,7 @@ router.post("/:id/enrollment", async (req, res) => {
     else if(id_user){
         const enrollmentInsertado = await eventService.insertEnrollment(id, id_user);
         if(enrollmentInsertado){
-            return res.status(232).send({
+            return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
                 valido: "usuario inscripto correctamente"
             });
         }

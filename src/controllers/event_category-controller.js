@@ -1,11 +1,12 @@
 import express from "express";
 import {EventCategoryService} from "../services/event_category-service.js";
 import { EventCategory } from "../entities/event_category.js";
+import { AuthMiddleware } from "../auth/authMiddleware.js";
 
 const router = express.Router();
 const eventCategoryService = new EventCategoryService();
 
-router.get("/", async (req, res) => {
+router.get("/", AuthMiddleware, async (req, res) => {
     const limit = req.query.limit ?? null;
     const offset = req.query.offset ?? 1;
 
@@ -20,7 +21,7 @@ router.get("/", async (req, res) => {
     
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", AuthMiddleware, async (req, res) => {
     try {
         const event_category = await eventCategoryService.getEvent_CategoryById(req.params.id);
         if(event_category){
@@ -35,7 +36,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", AuthMiddleware, async (req, res) => {
     const event_category = new EventCategory();
     event_category = {
         name: req.body.name,
@@ -51,7 +52,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", AuthMiddleware, async (req, res) => {
 
 });
 
