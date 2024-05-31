@@ -1,7 +1,7 @@
 import express from "express";
 import {EventsService} from "../services/events-service.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
-
+import { verificarObjeto } from "../utils/objetoVerificacion.js";
 
 const router = express.Router();
 const eventService = new EventsService();
@@ -88,7 +88,7 @@ router.post("/", AuthMiddleware, async (req, res) => {
         id_creator_user: req.body.id_creator_user
     }
     
-    if(event){
+    if(verificarObjeto(event)){
         const eventoCreado = await eventService.createEvent(event);
         if(eventoCreado){
             return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.

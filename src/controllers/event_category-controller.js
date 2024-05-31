@@ -2,6 +2,7 @@ import express from "express";
 import {EventCategoryService} from "../services/event_category-service.js";
 import { EventCategory } from "../entities/event_category.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { verificarObjeto } from "../utils/objetoVerificacion.js";
 
 const router = express.Router();
 const eventCategoryService = new EventCategoryService();
@@ -43,6 +44,9 @@ router.post("/", AuthMiddleware, async (req, res) => {
         display_order: req.body.display_order
     }
 
+    if(verificarObjeto(event_category)){
+
+    }
     try {
         const event_categoryCreado = await EventCategoryService.createEventCategory(event_category);
         return res.status(201);

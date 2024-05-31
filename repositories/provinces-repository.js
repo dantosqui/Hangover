@@ -15,7 +15,7 @@ export class ProvinceRepository {
             const sql = "INSERT INTO provinces (name, full_name, latitude, longitude, display_order) VALUES ($1, $2, $3, $4, $5)"; 
             const values = [province.name, province.full_name, province.latitude, province.longitude, province.display_order? province.display_order : null];
             const respuesta = await this.DBClient.query(sql, values);
-            if(respuesta.rows.length > 0){
+            if(respuesta.rowCount === 1){
                 return true;
             }else{
                 return false;
@@ -31,7 +31,7 @@ export class ProvinceRepository {
         return await this.DBClient.query(sql,values);
     }
 
-    async updateProvince(id, province) {
+    async updateProvince(province) {
         const attributes = [];
         
         if(province.name) attributes.push(`name = ${province.name}`);
@@ -41,8 +41,10 @@ export class ProvinceRepository {
         if(province.display_order) attributes.push(`id = ${province.display_order}`);
 
         const sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1`;
-        const values = [id];
-        return await this.DBClient.query(sql,values);
+        const values = [province.id];
+        const respuesta = await this.DBClient.query(sql,values);
+        console.log(respuesta.rowsCount);
+        return respuesta;
     }
 
     async getAllProvinces(limit, offset) {

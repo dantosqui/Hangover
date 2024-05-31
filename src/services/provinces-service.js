@@ -8,24 +8,43 @@ export class ProvincesService{
     }
     
     createProvince(province){
-        console.log(province);
-        console.log(province.latitude);
-        if(province.name.length <= 3 || isNaN(province.latitude) || isNaN(province.longitude)){
-            return false;
+        const [verificacion,mensaje] = this.verificarProvince(province);
+        if(verificacion){
+            const resultado = this.bd.createProvince(province);
+            return [resultado, null];
         }
         else{
-            const resultado = this.bd.createProvince(province);
-            return resultado;
+            return [false,mensaje];
         }
     }
 
-    updateProvince(id, province){
-
-        const resultado = this.bd.updateProvince(id, province);
-        if(resultado != null){
-            return true;
+    updateProvince(province){
+        const [verificacion,mensaje] = this.verificarProvince(province);
+        if(verificacion){
+            const resultado = this.bd.updateProvince(province);
+            if(resultado.rowCount > 0){
+                return [true,null];
+            }
+            else{
+                return [false,null];
+            }
         }
-        return false;
+        else{
+            return [false, mensaje];
+        }
+        
+    }
+
+    verificarProvince(province){
+        if(province.name.length < 3){
+            return [false, "El campo name está vacío o tiene menos de tres (3) letras."];
+        }
+        else if(isNaN(province.latitude) || isNaN(province.longitude)){
+            return [false, "Los campos latitude y longitude no son números."];
+        }
+        else{
+            return [true,null];
+        }
     }
 
     deleteProvincia(id){

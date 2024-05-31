@@ -2,6 +2,7 @@ import express from "express";
 import {ProvincesService} from "../services/provinces-service.js";
 import { Province } from "../entities/province.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { verificarObjeto } from "../utils/objetoVerificacion.js";
 
 const router = express.Router();
 const provinceService = new ProvincesService();
@@ -16,36 +17,50 @@ router.post("/", AuthMiddleware, async (req,res)=>{
         display_order: req.body.display_order
     }
 
-    if(province){
-        const provincia = await provinceService.createProvince(province);
+    if(province.display_order === undefined){
+        province.display_order = null;
+    }
+    
+    if(verificarObjeto(province)){
+        const [provincia,mensaje] = await provinceService.createProvince(province);
         if(provincia){
-            return res.status(201).send();
+            return res.status(201).send();  
         }
         else{
-            return res.status(400).send();
+            return res.status(400).send(mensaje);
         }
     }
     return res.status(400).send("Error en los campos");
 });
 
 
-router.patch( "/:id", AuthMiddleware, async (req,res) =>{
-    const id=req.params.id;
+router.patch( "/", AuthMiddleware, async (req,res) =>{
+    var province = new Province();
+    province = {
+        id: req.body.id,
+        name: req.body.name,
+        full_name: req.body.full_name,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        display_order: req.body.display_order
+    }
 
-    const province = new Province();
-    province.name = req.body.name;
-    province.full_name = req.body.full_name;
-    province.latitude = req.body.latitude;
-    province.longitude = req.body.longitude;
-    province.display_order = req.body.display_order
-
-        const provincia = await provinceService.updateProvince(id, province);
+    if(province.id === undefined){
+        return res.status(400).send();
+    }else{
+        const [provincia,mensaje] = await provinceService.updateProvince(province);
         if(provincia){
-            return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
-                valido: "provincia actualizada correctamente",
-            });
+            return res.status(200).send();
         }
-    return res.status(400).send("Error en los campos");
+        else if(mensaje !== null){
+            return res.status(400).send(mensaje);
+        }
+        else{
+            return res.status(404).send();
+        }
+        
+    }
+        
 });
 
 router.delete( "/:id", AuthMiddleware, async (req,res) =>{
