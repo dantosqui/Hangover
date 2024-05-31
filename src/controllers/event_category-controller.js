@@ -7,7 +7,7 @@ import { verificarObjeto } from "../utils/objetoVerificacion.js";
 const router = express.Router();
 const eventCategoryService = new EventCategoryService();
 
-router.get("/", AuthMiddleware, async (req, res) => {
+router.get("/", async (req, res) => {
     const limit = req.query.limit ?? null;
     const offset = req.query.offset ?? 1;
 
@@ -22,7 +22,7 @@ router.get("/", AuthMiddleware, async (req, res) => {
     
 });
 
-router.get("/:id", AuthMiddleware, async (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
         const event_category = await eventCategoryService.getEvent_CategoryById(req.params.id);
         if(event_category){

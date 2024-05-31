@@ -19,21 +19,12 @@ router.post("/login", async (req,res)=>{
     }
     else{
         if(username && password){
-            const token = await userService.ValidarUsuario(username, password);
-            if(token === false){
-                return res.status(401).send({
-                    success: false,
-                    message: "Usuario o clave inválida.",
-                    token: ""
-                });
-            }
-            else{
-                return res.status(200).send({
-                    success: true,
-                    message: "Usuario encontrado",
-                    token: token
-                });
-            }
+            const [success, token, statusCode, mensaje] = await userService.ValidarUsuario(username, password);
+            return res.status(statusCode).send({
+                success: success,
+                message: mensaje,
+                token: token
+            });
         }
         else{
             return res.status(400).send();
@@ -58,10 +49,9 @@ router.post("/register", async (req,res)=>{
         if(!validarFormatoEmail(user.username)){
             return res.status(400).send("El email es invalido.");
         }
-        const validoCampos = revisarCampos(user);
-        console.log(validoCampos);
-        if(typeof validoCampos !== 'boolean'){
-            return res.status(400).send(validoCampos);
+        const mensaje = revisarCampos(user);
+        if(mensaje != null){
+            return res.status(400).send(mensaje);
         }
         else{
             const respuesta = await userService.ValidarRegistro(user);

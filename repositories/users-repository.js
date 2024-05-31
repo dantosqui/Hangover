@@ -18,10 +18,10 @@ export class UserRepository {
             if(respuesta.rowCount > 0){
                 const token = createToken(respuesta.rows);
                 console.log(token);
-                return token;
+                return [true, token, 200, "Usuario encontrado"];
             }
             else{
-                return false;
+                return [false, "", 401, "Usuario o clave inválida."];
             }
         }
         catch(error){

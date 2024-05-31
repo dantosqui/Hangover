@@ -149,13 +149,39 @@ export class EventRepository {
     }
 
     async createEvent(event){
-        const query = "INSERT INTO events (name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max_assistance,id_creator_user) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)";
-        const values = [event.name, event.description, event.id_event_category, event.id_event_location, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrrolment, event.max_assistance, event.id_creator_user];
-        return await this.DBClient.query(query, values);
+        const max_capacity = await this.traerMaxCapacity(event.id_event_location);
+        if(event.max_assistance <= max_capacity){
+            const query = "INSERT INTO events (name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max_assistance,id_creator_user) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)";
+            const values = [event.name, event.description, event.id_event_category, event.id_event_location, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrrolment, event.max_assistance, event.id_creator_user];
+            const resultado = await this.DBClient.query(query, values);
+            if(resultado.rowCount > 0){
+                return [201, null];
+            }
+            else{
+                return [400, null];
+            }
+        }
+        else{
+            return [400, "El max_assistance es mayor que el max_capacity del  id_event_location."];
+        }
+       
     }
 
-    async updateEvent(id, event){
-        const attributes = []
+    async traerMaxCapacity(id) {
+        const query = "SELECT max_capacity FROM event_locations WHERE id = $1";
+        const values = [id];
+        const max_capacity = await this.DBClient.query(query, values);
+        return max_capacity;
+    }
+
+    async updateEvent(event, userId){
+
+        const max_capacity = await this.traerMaxCapacity(event.id_event_location);
+        if(event.max_assistance > max_capacity){
+            return [400, "El max_assistance es mayor que el max_capacity del  id_event_location."]
+        }
+
+        const attributes = [];
         
         if(event.name) attributes.push(`name = ${event.name}`);
         if(event.description) attributes.push(`description = ${event.description}`);
@@ -168,14 +194,25 @@ export class EventRepository {
         if(event.max_assistance) attributes.push(`max_assistance = ${event.max_assistance}`);
         if(event.id_creator_user) attributes.push(`id_creator_user = ${event.id_creator_user}`);
 
-        const sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1`;
-        const values = [id];
-        return await this.DBClient.query(sql, values);
+        var sql;
+        if(attributes.length == 0){
+            sql = `SELECT id from events WHERE id=$1 AND id_creator_user=$2`;
+        }
+        else{
+            sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1 AND id_creator_user=$2`;
+        }
+        const values = [event.id, userId];
+        const respuesta = await this.DBClient.query(sql,values);
+        if(respuesta.rowCount == 0){
+            return [404, "el id del evento no existe, o el evento no pertenece al usuario autenticado."];
+        }else{
+            return [200, null];
+        }
     }
 
-    async deleteEvent(id){
-        const query = "DELETE FROM events WHERE id = $1";
-        const values = [id];
+    async deleteEvent(id, userId){
+        const query = "DELETE FROM events WHERE id = $1 and id_creator_user = $2";
+        const values = [id, userId];
         return await this.DBClient.query(query, values);
     }
 

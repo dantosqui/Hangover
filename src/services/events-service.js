@@ -91,23 +91,43 @@ export class EventsService {
     }
 
     async createEvent(event){
-        const resultado = await this.bd.createEvent(event);
-        if(resultado != null){
-            return true;
+        const mensaje = this.verificarEvento(event);
+        if(mensaje != null){
+            const [statusCode, mensaje] = await this.bd.createEvent(event);
+            return [statusCode, mensaje];
         }
-        return false;
+        else{
+            return [400, mensaje];
+        }
+        
     }
 
-    updateEvent(id, keys, values){
-        const resultado = this.bd.updateProvince(id, keys, values);
-        if(resultado != null){
-            return true;
+    verificarEvento(e) {
+        if(e.name !== undefined && e.name < 3 || e.description !== undefined && e.description < 3){
+            return "El name o description están vacíos o tienen menos de tres (3) letras.";
         }
-        return false;
+        else if(e.price !== undefined && e.price || e.duration_in_minutes !== undefined && e.duration_in_minutes < 0){
+            return "El price o duration_in_minutes son menores que cero.";
+        }
+        else{
+            return null;
+        }
     }
 
-    deleteProvincia(id){
-        const resultado = this.bd.deleteEvent(id);
+    async updateEvent(event, userId){
+        const mensaje = this.verificarEvento(e);
+        if(mensaje != null){
+            const [statusCode, mensaje] = await this.bd.updateEvent(event, userId);
+            return [statusCode, mensaje];
+        }
+        else{
+            return [400, mensaje];
+        }
+        
+    }
+
+    deleteEvent(id, userId){
+        const resultado = this.bd.deleteEvent(id, userId);
         if(resultado){
             return true;
         }

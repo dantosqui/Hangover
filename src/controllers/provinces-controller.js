@@ -86,7 +86,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get("/:id", AuthMiddleware, async (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
         const province = await provinceService.getProvinceById(req.params.id);
         if(province.length > 0){
@@ -101,7 +101,7 @@ router.get("/:id", AuthMiddleware, async (req, res) => {
     }
 });
 
-router.get("/:id/locations", AuthMiddleware, async (req, res) => {
+router.get("/:id/locations", async (req, res) => {
     const limit = req.query.limit;
     const offset = req.query.offset;
     try {
