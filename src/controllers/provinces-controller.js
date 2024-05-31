@@ -34,7 +34,7 @@ router.post("/", AuthMiddleware, async (req,res)=>{
 });
 
 
-router.patch( "/", AuthMiddleware, async (req,res) =>{
+router.put( "/", AuthMiddleware, async (req,res) =>{
     var province = new Province();
     province = {
         id: req.body.id,
@@ -66,11 +66,12 @@ router.patch( "/", AuthMiddleware, async (req,res) =>{
 router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     const deleted = await provinceService.deleteProvince(req.params.id);
     if(deleted){
-        return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
-            valido: "provincia eliminada correctamente"
-        });
+        return res.status(200).send();
     }
-    return res.status(400).send("Error en los campos");
+    else{
+        return res.status(404).send();
+    }
+    
 });
 
 router.get("/", async (req, res) => {

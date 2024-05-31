@@ -7,10 +7,10 @@ export class ProvincesService{
         this.bd = new ProvinceRepository();
     }
     
-    createProvince(province){
+    async createProvince(province){
         const [verificacion,mensaje] = this.verificarProvince(province);
         if(verificacion){
-            const resultado = this.bd.createProvince(province);
+            const resultado = await this.bd.createProvince(province);
             return [resultado, null];
         }
         else{
@@ -18,11 +18,12 @@ export class ProvincesService{
         }
     }
 
-    updateProvince(province){
+    async updateProvince(province){
         const [verificacion,mensaje] = this.verificarProvince(province);
         if(verificacion){
-            const resultado = this.bd.updateProvince(province);
-            if(resultado.rowCount > 0){
+            const resultado = await this.bd.updateProvince(province);
+            if(resultado > 0){
+                console.log("holaaa");
                 return [true,null];
             }
             else{
@@ -36,10 +37,10 @@ export class ProvincesService{
     }
 
     verificarProvince(province){
-        if(province.name.length < 3){
+        if(province.name !== undefined && province.name.length < 3){
             return [false, "El campo name está vacío o tiene menos de tres (3) letras."];
         }
-        else if(isNaN(province.latitude) || isNaN(province.longitude)){
+        else if(province.latitude !== undefined && isNaN(province.latitude) || province.longitude !== undefined && isNaN(province.longitude)){
             return [false, "Los campos latitude y longitude no son números."];
         }
         else{
@@ -47,8 +48,9 @@ export class ProvincesService{
         }
     }
 
-    deleteProvincia(id){
-        return this.bd.deleteProvince(id);
+    async deleteProvince(id){
+        const eliminado = await this.bd.deleteProvince(id);
+        return eliminado.rowCount > 0;
     }
 
     async getAllProvinces(limit, offset, url){

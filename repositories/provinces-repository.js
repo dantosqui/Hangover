@@ -28,23 +28,30 @@ export class ProvinceRepository {
     async deleteProvince(id) {
         const sql = "DELETE FROM provinces WHERE id = $1";
         const values = [id];
-        return await this.DBClient.query(sql,values);
+        const eliminado = await this.DBClient.query(sql,values);
+        return eliminado;
     }
 
     async updateProvince(province) {
         const attributes = [];
         
-        if(province.name) attributes.push(`name = ${province.name}`);
-        if(province.full_name) attributes.push(`full_name = ${province.full_name}`);
+        if(province.name) attributes.push(`name = '${province.name}'`);
+        if(province.full_name) attributes.push(`full_name = '${province.full_name}'`);
         if(province.latitude) attributes.push(`latitude = ${province.latitude}`);
         if(province.longitude) attributes.push(`longitude = ${province.longitude}`);
-        if(province.display_order) attributes.push(`id = ${province.display_order}`);
-
-        const sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1`;
+        if(province.display_order) attributes.push(`display_order = ${province.display_order}`);
+        var sql;
+        if(attributes.length == 0){
+            sql = `SELECT id from provinces WHERE id=$1`;
+        }
+        else{
+            sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1`;
+        }
         const values = [province.id];
         const respuesta = await this.DBClient.query(sql,values);
-        console.log(respuesta.rowsCount);
-        return respuesta;
+        console.log(respuesta.rowCount);
+        return respuesta.rowCount;
+        
     }
 
     async getAllProvinces(limit, offset) {

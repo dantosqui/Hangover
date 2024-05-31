@@ -1,6 +1,7 @@
 import express from "express";
 import {UsersService} from "../services/users-service.js";
 import { User } from "../entities/user.js";
+import { verificarObjeto } from "../utils/objetoVerificacion.js"; 
 
 const router = express.Router();
 const userService = new UsersService();
@@ -8,26 +9,37 @@ const userService = new UsersService();
 router.post("/login", async (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
-    if(username && password){
-        const token = await userService.ValidarUsuario(username, password);
-        if(token){
-            return res.status(200).send({
-                success: true,
-                message: "Usuario encontrado",
-                token: token
-            });
-        }
-        else{
-            return res.status(401).send({
-                success: false,
-                message: "Usuario o clave inválida",
-                token: ""
-            });
-        }
+
+    if(!validarFormatoEmail(username)){
+        return res.status(400).send({
+            success: false,
+            message: "El email es invalido.",
+            token: ""
+        });
     }
     else{
-        return res.status(400);
+        if(username && password){
+            const token = await userService.ValidarUsuario(username, password);
+            if(token === false){
+                return res.status(401).send({
+                    success: false,
+                    message: "Usuario o clave inválida.",
+                    token: ""
+                });
+            }
+            else{
+                return res.status(200).send({
+                    success: true,
+                    message: "Usuario encontrado",
+                    token: token
+                });
+            }
+        }
+        else{
+            return res.status(400).send();
+        }
     }
+    
 });
 
 router.post("/register", async (req,res)=>{
@@ -39,28 +51,40 @@ router.post("/register", async (req,res)=>{
         password: req.body.password
     }
 
-    const validoCampos = revisarCampos(user);
-    if(typeof validoCampos === 'boolean'){
-        const respuesta = await userService.ValidarRegistro(user);
-        if(respuesta){
-            return res.status(201).send();
-        }
-        else{
-            return res.status(400).send("ya existe el nombre de usuario");
-        }
+    if(!verificarObjeto(user)){
+        return res.status(400).send();
     }
     else{
-        return res.status(400).send(validoCampos);
+        if(!validarFormatoEmail(user.username)){
+            return res.status(400).send("El email es invalido.");
+        }
+        const validoCampos = revisarCampos(user);
+        console.log(validoCampos);
+        if(typeof validoCampos !== 'boolean'){
+            return res.status(400).send(validoCampos);
+        }
+        else{
+            const respuesta = await userService.ValidarRegistro(user);
+            if(respuesta){
+                return res.status(201).send();
+            }
+            else{
+                return res.status(400).send("ya existe el nombre de usuario");
+            }
+        }
     }
+    
 });
+
+const validarFormatoEmail = (email) => {
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regexEmail.test(email);
+}
 
 const revisarCampos = (user) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if(!user.first_name || !user.last_name){
         return "El nombre y apellido son obligatorios";
-    }
-    else if(!regex.test(user.username)){
-        return "El formato de correo electrónico no es válido";
     }
     else if(user.password.length < 3){
         return "La contraseña debe tener al menos 3 caracteres";

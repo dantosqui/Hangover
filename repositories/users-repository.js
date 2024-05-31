@@ -15,7 +15,7 @@ export class UserRepository {
             const query = "SELECT id, username, password FROM users WHERE username = $1 AND password = $2"; 
             const values = [username, password];
             const respuesta = await this.DBClient.query(query, values);
-            if(respuesta){
+            if(respuesta.rowCount > 0){
                 const token = createToken(respuesta.rows);
                 console.log(token);
                 return token;
