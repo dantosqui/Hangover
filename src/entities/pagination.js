@@ -1,4 +1,15 @@
-export class Pagination {
+class Pagination {
+    static SetLimit(bit){
+        switch(bit){
+            case 1:
+                return 100;
+            break;
+            case 0:
+                return 20;
+            break;
+        }
+    }
+
     static BuildPagination(collection, limit, offset, url, total){
         return {
             collection: collection,
@@ -19,13 +30,11 @@ export class Pagination {
         
     }
 
-    static ParseLimit(limit) {
-        return !isNaN(limit) && limit > 0 ? limit : 10;
-    }
-
-    static ParseOffset(offset) {
-        return !isNaN(offset) ? offset : 0;
+    static VerifyTotal(limit, offset, total){
+        return (parseInt(offset) + 1)*limit < total;
     }
 
     
 }
+
+export default Pagination
