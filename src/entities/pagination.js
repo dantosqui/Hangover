@@ -10,6 +10,10 @@ class Pagination {
         }
     }
 
+    static VerifyOffset(offset){
+        return isNaN(offset)?0:offset;
+    }
+
     static BuildPagination(collection, limit, offset, url, total){
         return {
             collection: collection,
@@ -31,7 +35,7 @@ class Pagination {
     }
 
     static VerifyTotal(limit, offset, total){
-        return (parseInt(offset) + 1)*limit < total;
+        return (parseInt(offset))*limit < total;
     }
 
     

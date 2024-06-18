@@ -1,23 +1,23 @@
 import  express from "express";
 import  Pagination  from "../entities/pagination.js";
 import PostService from "../services/post-service.js"
-
+import { AuthMiddleware } from "../auth/authMiddleware.js";
 
 
 const router = express.Router()
 const postService = new PostService()
 
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", AuthMiddleware, async (req, res) => {
     const idPost=req.params.id
-    const [post, comments] = postService.GetPostById(idPost)
-
+    const [post, comments] = postService.GetPostById(idPost);
+    
     if (post===null){
         return res.status(404).send();
     }
     else{
         const limit = Pagination.SetLimit(0);
-        const collection = postService.GetAllPost(limit, offset);
+        const collection = await postService.GetAllPost(limit, offset);
         return res.status(200).json([post, comments], collection);
     }
 
@@ -25,8 +25,8 @@ router.get("/:id", async (req, res) => {
 
 router.get("/",async (req, res) =>{
     const limit = Pagination.SetLimit(1);
-    const offset = req.query.offset;
-    const collection = postService.GetAllPost(limit, offset);
+    const offset = Pagination.VerifyOffset(req.query.offset);
+    const collection = await postService.GetAllPost(limit, offset);
     if(collection === null){
         return res.status(404).send();
     }

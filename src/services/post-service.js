@@ -7,12 +7,13 @@ export default class PostsService {
     }
 
     async GetPostById(id) {
-        const [post,comments] = this.bd.getPostById(id);
+        const [post,comments] = await this.bd.getPostById(id);
+        console.log("hola");
         return [post,comments];
     }
 
     async GetAllPost(limit, offset){
-        const collection = this.bd.getAllPost(limit, offset);
+        const collection = await this.bd.getAllPost(limit, offset);
         return collection;
     }
 

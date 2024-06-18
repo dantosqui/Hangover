@@ -17,19 +17,17 @@ export class PostRepository {
             'username', users.username,
             'profile_photo', users.profile_photo,
             'follower_number', (SELECT COUNT(id) FROM user_relationships WHERE followed_id = users.id)
-        ) AS creatorUser
+        ) AS creatorUser,
         json_build_object (
-            'id', pp.id,
-            'url', pp.url,
-            'type', pp.type
+            'front_image', posts.front_image,
+            'back_image', posts.back_image
         ) AS post_image
         FROM posts 
         INNER JOIN users on posts.creator_id = users.id
-        INNER JOIN post_photos pp ON pp.post_id = posts.id
-        WHERE id = $1"`;
+        WHERE posts.id = $1`;
         let value = id;
         const post = (await this.DBClient.query(query, value)).rows;
-        
+        console.log("holla");
         query =     
         `SELECT
         json_build_object (
@@ -40,13 +38,13 @@ export class PostRepository {
             'content', c.content,
             'comment_id', c.id,
             'parent_id', c.parent_id,
-            'likes', (SELECT COUNT(id) FROM comments_like WHERE comment_id = c.id)
+            'likes', (SELECT COUNT(id) FROM comment_likes WHERE comment_id = c.id)
         ) AS comment,
         COUNT(c.id) AS total_comments
         FROM comments c 
         INNER JOIN users u ON c.creator_id = u.id
         WHERE c.post_id = $1
-        GROUP BY c.id`;
+        GROUP BY c.id, u.id`;
         value = id;
         const comments = (await this.DBClient.query(query, value)).rows;
 
@@ -54,32 +52,33 @@ export class PostRepository {
 
     }
 
-    async getaAllPost(limit, offset){
-        let query = "SELECT COUNT(id) FROM posts";
+    async getAllPost(limit, offset){
+        let query = "SELECT COUNT(id) AS total FROM posts";
         const total = await this.DBClient.query(query);
-        if(Pagination.VerifyTotal(limit, offset, total)){
+        const moreContent = Pagination.VerifyTotal(limit, offset, total.rows[0].total);
+        if(moreContent){
             query = `
             SELECT
             json_build_object (
-                json_build_object (
-                    'id', u.id
+                'creator_user', json_build_object (
+                    'id', u.id,
                     'username', u.username,
                     'profile_photo', u.profile_photo
-                ) AS creator_user,
-                json_build_object (
-                    'id', pp.id,
-                    'image', pp.url
-                ) AS post_image
+                ),
+                'front_image', p.front_image
             ) AS post
-            FROM posts p
-            INNER JOIN users u ON p.creator_id = u.id
-            INNER JOIN post_photos pp ON pp.post_id = p.id WHERE pp.type = 'front'
-            LIMIT $1 OFFSET $2
+            FROM 
+                posts p
+            INNER JOIN 
+                users u ON p.creator_id = u.id
+            LIMIT $1 OFFSET $2;
             `;
-            const collection = await this.DBClient.query(query);
-            return collection;
+            const values = [limit, offset];
+            const collection = await this.DBClient.query(query, values);
+            return collection.rows;
         }
         else{
+            console.log(total.rows[0].total);
             return null;
         }
     }
