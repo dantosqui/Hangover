@@ -31,4 +31,24 @@ export default class PostsService {
         return inserted;
     }
 
+    async InsertCommentLikes(like){
+        const inserted = await this.bd.insertCommentLikes(like);
+        return inserted;
+    }
+
+    async DeleteCommentLikes(like){
+        const deleted = await this.bd.deleteCommentLikes(like);
+        return deleted;
+    }
+
+    async InsertLiked(like){
+        const inserted = await this.bd.insertLiked(like);
+        return inserted;
+    }
+
+    async DeleteLiked(like){
+        const deleted = await this.bd.deleteLiked(like);
+        return deleted;
+    }
+
 }

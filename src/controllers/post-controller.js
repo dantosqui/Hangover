@@ -1,7 +1,9 @@
 import  express from "express";
-import  Pagination  from "../entities/pagination.js";
 import PostService from "../services/post-service.js"
 import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { Comment } from "../entities/comment.js";
+import { CommentLikes } from "../entities/comment_likes.js";
+import { Liked } from "../entities/liked.js";
 
 
 const router = express.Router()
@@ -11,6 +13,7 @@ router.get("/:id", async (req, res) => {
     const idPost=req.params.id;
     const post = await postService.GetPostById(idPost);
     const comments = await postService.GetCommentsPost(idPost);
+    const likedByUser = await postService.GetLikedByUser();
 
     if (post===null){
         return res.status(404).send();
@@ -49,14 +52,17 @@ router.get("/",async (req, res) =>{
     }
 }); 
 
-router.post("/:id/comments", AuthMiddleware, async (req,res)=> {
+router.post("/:id/comment", AuthMiddleware, async (req,res)=> {
     const comment = new Comment(
+        null,
         req.body.post_id, 
         req.body.content,
         req.body.likes, 
         req.body.parent_id, 
-        req.body.creator_id
-    )
+        req.user
+    );
+
+
 
     const inserted = await postService.InsertComment(comment);
     if(inserted){
@@ -65,14 +71,74 @@ router.post("/:id/comments", AuthMiddleware, async (req,res)=> {
     else{
         return res.status(400).send();
     }
-})
+});
 
-//likear comentario
+router.post("/:idPost/:idComment", AuthMiddleware, async (req,res)=> {
+    const like = new CommentLikes(
+        null,
+        req.params.idComment,
+        req.user    
+    );
+    
+    const inserted = await postService.InsertCommentLikes(like);
+    if(inserted){
+        return res.status(201).send();
+    }
+    else{
+        return res.status(400).send();
+    }
+    
+});
 
-//likear post
+router.delete("/:idPost/:idComment", AuthMiddleware, async (req,res)=> {
+    const like = new CommentLikes(
+        null,
+        req.params.idComment,
+        req.user    
+    );
+    
+    const deleted = await postService.DeleteCommentLikes(like);
+    if(deleted){
+        return res.status(204).send();
+    }
+    else{
+        return res.status(400).send();
+    }
+    
+});
+
+router.post("/:id/like", AuthMiddleware, async (req,res)=> {
+    const like = new Liked(
+        null,
+        req.params.id,
+        req.user
+    ); 
+
+    const inserted = await postService.InsertLiked(like);
+    if(inserted){
+        return res.status(201).send();
+    }
+    else{
+        return res.status(400).send();
+    }
+});
+
+router.delete("/:id/like", AuthMiddleware, async (req,res)=> {
+    const like = new Liked(
+        null,
+        req.params.id,
+        req.user
+    ); 
+
+    const deleted = await postService.DeleteLiked(like);
+    if(deleted){
+        return res.status(204).send();
+    }
+    else{
+        return res.status(400).send();
+    }
+});
 
 //guardar post
-
-//agregar bolsa a la base de datos y añadir a la bolsa
 
 export default router

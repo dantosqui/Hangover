@@ -26,8 +26,18 @@ export class PostRepository {
         FROM posts 
         INNER JOIN users on posts.creator_id = users.id
         WHERE posts.id = $1`;
-        const post = (await this.DBClient.query(query, [id])).rows;
-        return post;
+
+        try {
+            const post = (await this.DBClient.query(query, [id])).rows;
+            return post;
+        }
+        catch(error) {
+            console.error("Error capturado:", error);
+
+            // Devolver un código de estado 500
+            res.status(500).send('Error interno del servidor');
+        }
+        
     }
 
     async getCommentsPost(id, limit_comments_post, page_comments_post){
@@ -118,9 +128,70 @@ export class PostRepository {
             const inserted = await this.DBClient.query(query, values);
             return inserted.rowCount > 0;
         } catch (error) {
-            console.log('Error al insertar comentario:', error);
+            console.error("Error capturado:", error);
+
+            // Devolver un código de estado 500
+            res.status(500).send('Error interno del servidor');
         }
         
+    }
+
+    async insertCommentLikes(like){
+        const query = "INSERT INTO comment_likes (comment_id, user_id) VALUES ($1, $2)";
+        const values = [like.comment_id, like.user_id];
+        try{
+            const inserted = await this.DBClient.query(query, values);
+            return inserted.rowCount > 0;
+        }
+        catch ( error ) {
+            console.error("Error capturado:", error);
+
+            // Devolver un código de estado 500
+            res.status(500).send('Error interno del servidor');
+        }
+    }
+
+    async deleteCommentLikes(like){
+        const query = "DELETE FROM comment_likes WHERE comment_id = $1 AND user_id = $2";
+        const values = [like.comment_id, like.user_id];
+        try{
+            const deleted = await this.DBClient.query(query, values);
+            return deleted.rowCount > 0;
+        } catch(error){
+            console.error("Error capturado:", error);
+
+            // Devolver un código de estado 500
+            res.status(500).send('Error interno del servidor');
+        }
+    }
+
+    async insertLiked(like){
+        const query = "INSERT INTO liked (user_id, post_id) VALUES ($1, $2)";
+        const values = [like.user_id, like.post_id];
+        try{
+            const inserted = await this.DBClient.query(query, values);
+            return inserted.rowCount > 0;
+        }
+        catch ( error ) {
+            console.error("Error capturado:", error);
+
+            // Devolver un código de estado 500
+            res.status(500).send('Error interno del servidor');
+        }
+    }
+
+    async deleteLiked(like){
+        const query = "DELETE FROM liked WHERE user_id = $1 AND post_id = $2";
+        const values = [like.user_id, like.post_id];
+        try{
+            const deleted = await this.DBClient.query(query, values);
+            return deleted.rowCount > 0;
+        } catch(error) {
+            console.error("Error capturado:", error);
+
+            // Devolver un código de estado 500
+            res.status(500).send('Error interno del servidor');
+        }
     }
 
 

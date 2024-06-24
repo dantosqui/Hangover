@@ -35,6 +35,7 @@ router.post("/register", validateUserFields, async (req,res)=>{
     }
 
     const user = new User(
+        null,
         req.body.username,
         req.body.first_name,
         req.body.last_name,
