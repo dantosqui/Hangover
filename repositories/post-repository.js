@@ -111,4 +111,17 @@ export class PostRepository {
         
     }
 
+    async insertComment(comment){
+        const query = "INSERT INTO comments (post_id, content, date_posted, likes, parent_id, creator_id) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)";
+        const values = [comment.post_id, comment.content, comment.likes, comment.parent_id, comment.creator_id];                
+        try{
+            const inserted = await this.DBClient.query(query, values);
+            return inserted.rowCount > 0;
+        } catch (error) {
+            console.log('Error al insertar comentario:', error);
+        }
+        
+    }
+
+
 }

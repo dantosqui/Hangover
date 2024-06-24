@@ -26,4 +26,9 @@ export default class PostsService {
         return collection;
     }
 
+    async InsertComment(comment){
+        const inserted = await this.bd.insertComment(comment);
+        return inserted;
+    }
+
 }

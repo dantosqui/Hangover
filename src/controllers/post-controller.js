@@ -7,8 +7,6 @@ import { AuthMiddleware } from "../auth/authMiddleware.js";
 const router = express.Router()
 const postService = new PostService()
 
-const limitComments = 10
-
 router.get("/:id", async (req, res) => {
     const idPost=req.params.id;
     const post = await postService.GetPostById(idPost);
@@ -51,8 +49,30 @@ router.get("/",async (req, res) =>{
     }
 }); 
 
-/*router.post("/:id/comments",AuthMiddleware,async (req,res)=> {
-    const comment = new 
-})*/
+router.post("/:id/comments", AuthMiddleware, async (req,res)=> {
+    const comment = new Comment(
+        req.body.post_id, 
+        req.body.content,
+        req.body.likes, 
+        req.body.parent_id, 
+        req.body.creator_id
+    )
+
+    const inserted = await postService.InsertComment(comment);
+    if(inserted){
+        return res.status(201).send();
+    }
+    else{
+        return res.status(400).send();
+    }
+})
+
+//likear comentario
+
+//likear post
+
+//guardar post
+
+//agregar bolsa a la base de datos y añadir a la bolsa
 
 export default router
