@@ -98,8 +98,10 @@ export class PostRepository {
     }
 
     async getAllPost(limit, page){
+        page=page-1
         let query = `
             SELECT
+            p.id,
             json_build_object (
                 'creator_user', json_build_object (
                     'id', u.id,
