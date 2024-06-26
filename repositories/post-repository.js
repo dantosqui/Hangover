@@ -10,6 +10,7 @@ export class PostRepository {
     }
 
     async getPostById(id){
+        
         const query = 
         `SELECT posts.*, 
         json_build_object (
@@ -35,12 +36,13 @@ export class PostRepository {
             console.error("Error capturado:", error);
 
             // Devolver un código de estado 500
-            res.status(500).send('Error interno del servidor');
+            //res no existe aca res.status(500).send('Error interno del servidor');
         }
         
     }
 
     async getCommentsPost(id, limit_comments_post, page_comments_post){
+        
         let query = 
         `SELECT
         json_build_object (
@@ -53,7 +55,7 @@ export class PostRepository {
             'parent_id', c.parent_id,
             'likes', (SELECT COUNT(id) FROM comment_likes WHERE comment_id = c.id)
         ) AS comment,
-        (SELECT COUNT(*) FROM comments WHERE parent_id = c.id) AS total_responses_comment,
+        (SELECT COUNT(id) FROM comments WHERE parent_id = c.id) AS total_responses_comment
         FROM comments c
         INNER JOIN users u ON c.creator_id = u.id
         WHERE c.post_id = $1 AND c.parent_id IS NULL
@@ -65,7 +67,7 @@ export class PostRepository {
         query = "SELECT COUNT(id) AS total FROM comments WHERE post_id = $1";
         const total_comments_post = (await this.DBClient.query(query, [id])).rows[0].total;
 
-        return Pagination.BuildPagination(comments, limit, page, total_comments_post);
+        return Pagination.BuildPagination(comments, limit_comments_post, page_comments_post, total_comments_post);
     }
 
     async getResponsesComment(idComment, limit_responses_comment, page_responses_comment){

@@ -11,9 +11,11 @@ const postService = new PostService()
 
 router.get("/:id", async (req, res) => {
     const idPost=req.params.id;
+    const limitComments=req.query.limitComments
+    const offsetComments=req.query.offsetComments
     const post = await postService.GetPostById(idPost);
-    const comments = await postService.GetCommentsPost(idPost);
-    const likedByUser = await postService.GetLikedByUser();
+    const comments = await postService.GetCommentsPost(idPost,limitComments,offsetComments);
+    //const likedByUser = await postService.GetLikedByUser();
 
     if (post===null){
         return res.status(404).send();
