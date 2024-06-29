@@ -59,7 +59,7 @@ router.post("/:id/comment", AuthMiddleware, async (req,res)=> {
         null,
         req.body.post_id, 
         req.body.content,
-        req.body.likes, 
+        0, 
         req.body.parent_id, 
         req.user
     );
