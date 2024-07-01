@@ -11,6 +11,7 @@ router.post("/login", async (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
         const [success, token, statusCode] = await userService.ValidateUser(username, password);
+        console.log(success, token);
             return res.status(statusCode).send({
                 success: success,
                 token: token

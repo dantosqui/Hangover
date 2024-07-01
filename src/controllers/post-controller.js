@@ -55,26 +55,32 @@ router.get("/",async (req, res) =>{
 }); 
 
 router.post("/:id/comment", AuthMiddleware, async (req,res)=> {
-    let comment = new Comment(
-        null,
-        req.body.post_id, 
-        req.body.content,
-        null,
-        '0', 
-        req.body.parent_id, 
-        req.user.id
-    );
-    comment.likes=0
-
-
-
-    const inserted = await postService.InsertComment(comment);
-    if(inserted){
-        return res.status(201).send();
+    if(req.user){
+        let comment = new Comment(
+            null,
+            req.body.post_id, 
+            req.body.content,
+            null,
+            '0', 
+            req.body.parent_id, 
+            req.user.id
+        );
+        comment.likes=0
+    
+    
+    
+        const inserted = await postService.InsertComment(comment);
+        if(inserted){
+            return res.status(201).send();
+        }
+        else{
+            return res.status(400).send();
+        }
     }
     else{
-        return res.status(400).send();
+        return res.status(401).send();
     }
+    
 });
 
 router.post("/:idPost/:idComment", AuthMiddleware, async (req,res)=> {
