@@ -27,4 +27,5 @@ export const decryptToken = (encryptedToken) => {
     } catch(e) {
         console.error(e);
     }
+    return payloadOriginal
 };

@@ -2,6 +2,7 @@
 import {UsersService} from "../services/user-service.js";
 import { User } from "../entities/user.js";
 import { body, validationResult } from 'express-validator';
+import {AuthMiddleware} from "../auth/AuthMiddleware.js" 
 
 const router = express.Router();
 const userService = new UsersService();
@@ -73,8 +74,9 @@ const checkBirthDate = (date) => {
     }
 }
 
-router.get("/:id", async (req, res) => {
-    const user = await userService.GetUserById(req.params.id);
+router.get("/", AuthMiddleware, async (req, res) => {
+    console.log("req user",req.user)
+    const user = await userService.GetUserById(req.user.id);
     if(user === null){
         return res.status(404).send("No existe el usuario");
     }

@@ -17,7 +17,6 @@ export class UserRepository {
             const response = await this.DBClient.query(query, values);
             if(response.rowCount > 0){
                 const token = createToken(response.rows);
-                console.log(token);
                 return [true, token, 200];
             }
             else{
@@ -56,8 +55,8 @@ export class UserRepository {
     async getUserById(id){
         try {
             const query = "SELECT * FROM users WHERE id = $1";
-            const value = id;
-            const user = await this.DBClient.query(query,value);
+            
+            const user = await this.DBClient.query(query,[id]);
             return user.rows;
         }
         catch(e){

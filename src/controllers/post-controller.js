@@ -55,14 +55,16 @@ router.get("/",async (req, res) =>{
 }); 
 
 router.post("/:id/comment", AuthMiddleware, async (req,res)=> {
-    const comment = new Comment(
+    let comment = new Comment(
         null,
         req.body.post_id, 
         req.body.content,
-        0, 
+        null,
+        '0', 
         req.body.parent_id, 
-        req.user
+        req.user.id
     );
+    comment.likes=0
 
 
 

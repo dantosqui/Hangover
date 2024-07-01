@@ -120,7 +120,7 @@ export class PostRepository {
 
         query = "SELECT COUNT(id) AS total FROM posts";
         const total = (await this.DBClient.query(query)).rows[0].total;
-
+                
         return Pagination.BuildPagination(collection, limit, page, total);
         
     }
