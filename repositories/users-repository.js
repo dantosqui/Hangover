@@ -20,11 +20,12 @@ export class UserRepository {
                 return [true, token, 200];
             }
             else{
-                return [false, "", 400];
+                return [false, "", 404];
             }
         }
         catch(e){
             console.log(e);
+            return [false, "", 500];
         }
     }
 
