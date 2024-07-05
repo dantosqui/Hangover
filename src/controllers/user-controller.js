@@ -76,7 +76,6 @@ const checkBirthDate = (date) => {
 }
 
 router.get("/", AuthMiddleware, async (req, res) => {
-    console.log("req user",req.user)
     const user = await userService.GetUserById(req.user.id);
     if(user === null){
         return res.status(404).send("No existe el usuario");
@@ -85,5 +84,10 @@ router.get("/", AuthMiddleware, async (req, res) => {
         return res.status(200).json(user);
     }
 });
+
+router.get("/library",AuthMiddleware,async (req,res) => {
+    const saved = await userService.getSavedLikedPosts(req.user.id)
+    return res.status(200).json(saved)
+})
 
 export default router;

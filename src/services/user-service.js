@@ -20,4 +20,9 @@ export class UsersService{
         const user = await this.bd.getUserById(id);
         return user;
     }
+
+    async getSavedLikedPosts(userId){
+        const posts = await this.bd.getSavedLikedPosts(userId)
+        return posts
+    }
 }
