@@ -1,11 +1,13 @@
 class Pagination {
     static BuildPagination(collection, limit, page, total){
+        
         return {
+            
             collection: collection,
             pagination: {
                 limit: limit, 
                 page: page,
-                nextPage: this.VerifyTotal(limit, page+1, total) ? page+1 : null,
+                nextPage: this.VerifyTotal(limit, page+1, total),
                 total: total
             }
 

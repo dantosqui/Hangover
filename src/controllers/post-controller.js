@@ -46,6 +46,12 @@ router.get("/",async (req, res) =>{
     const limit = req.query.limit;
     const page = req.query.page;
     const collection = await postService.GetAllPost(limit, page);
+    if (collection.pagination.nextPage){
+        const reqpath = req.path==="/" ? "" : req.path
+        const nPage = Number(Number(req.query.page)+Number(1)) //javascript
+        let nextPage="http://"+req.get('host') + req.baseUrl + reqpath+"/?limit="+req.query.limit+"&page="+nPage
+        collection.pagination.nextPage=nextPage
+    }
     if(collection === null){
         return res.status(404).send();
     }
