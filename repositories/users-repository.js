@@ -17,6 +17,7 @@ export class UserRepository {
             const response = await this.DBClient.query(query, values);
             if(response.rowCount > 0){
                 const token = createToken(response.rows);
+                console.log(token);
                 return [true, token, 200];
             }
             else{

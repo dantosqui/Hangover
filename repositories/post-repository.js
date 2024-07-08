@@ -97,7 +97,7 @@ export class PostRepository {
 
     }
 
-    async getAllPost(limit, page){
+    async getAllPost(limit, page, userId){
         page=page-1
         let query = `
             SELECT
@@ -114,9 +114,16 @@ export class PostRepository {
                 posts p
             INNER JOIN 
                 users u ON p.creator_id = u.id
-            LIMIT $1 OFFSET $2;
+            WHERE 
+                NOT EXISTS (
+                    SELECT 1 
+                    FROM saved s 
+                    WHERE s.user_id = $1 
+                    AND s.post_id = p.id
+                )
+            LIMIT $2 OFFSET $3;
             `;
-        const collection = (await this.DBClient.query(query, [limit, page*limit])).rows;
+        const collection = (await this.DBClient.query(query, [userId, limit, page*limit])).rows;
 
         query = "SELECT COUNT(id) AS total FROM posts";
         const total = (await this.DBClient.query(query)).rows[0].total;
@@ -135,7 +142,7 @@ export class PostRepository {
             console.error("Error capturado:", error);
 
             // Devolver un código de estado 500
-            res.status(500).send('Error interno del servidor');
+            return false;
         }
         
     }
@@ -151,7 +158,7 @@ export class PostRepository {
             console.error("Error capturado:", error);
 
             // Devolver un código de estado 500
-            res.status(500).send('Error interno del servidor');
+            return false;
         }
     }
 
@@ -165,7 +172,7 @@ export class PostRepository {
             console.error("Error capturado:", error);
 
             // Devolver un código de estado 500
-            res.status(500).send('Error interno del servidor');
+            return false;
         }
     }
 
@@ -180,7 +187,7 @@ export class PostRepository {
             console.error("Error capturado:", error);
 
             // Devolver un código de estado 500
-            res.status(500).send('Error interno del servidor');
+            return false;
         }
     }
 
@@ -194,9 +201,36 @@ export class PostRepository {
             console.error("Error capturado:", error);
 
             // Devolver un código de estado 500
-            res.status(500).send('Error interno del servidor');
+            return false;
         }
     }
+
+    async insertSaved(saved){
+        const query = "INSERT INTO saved (user_id, post_id) VALUES ($1, $2)";
+        const values = [saved.user_id, saved.post_id];
+        try{
+            const inserted = await this.DBClient.query(query, values);
+            return inserted.rowCount > 0;
+        }
+        catch(error){
+            console.error("Error capturado:", error);
+            return false;
+        }
+    }
+
+    async deleteSaved(saved){
+        const query = "DELETE FROM saved WHERE user_id=$1 AND post_id=$2)";
+        const values = [saved.user_id, saved.post_id];
+        try{
+            const deleted = await this.DBClient.query(query, values);
+            return deleted.rowCount > 0;
+        }
+        catch(error){
+            console.error("Error capturado:", error);
+            return false;
+        }
+    }
+
 
 
 }

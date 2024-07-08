@@ -21,8 +21,8 @@ export default class PostsService {
         return responses;
     }
 
-    async GetAllPost(limit, page){
-        const collection = await this.bd.getAllPost(limit, page);
+    async GetAllPost(limit, page, userId){
+        const collection = await this.bd.getAllPost(limit, page, userId);
         return collection;
     }
 
@@ -49,6 +49,16 @@ export default class PostsService {
     async DeleteLiked(like){
         const deleted = await this.bd.deleteLiked(like);
         return deleted;
+    }
+
+    async InsertSaved(saved){
+        const inserted = await this.bd.insertSaved(saved);
+        return inserted;
+    }
+
+    async DeleteSaved(saved){
+        const deleted = await this.bd.deleteSaved(saved);
+        return saved;
     }
 
 }

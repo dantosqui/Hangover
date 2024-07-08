@@ -4,6 +4,7 @@ import { AuthMiddleware } from "../auth/authMiddleware.js";
 import { Comment } from "../entities/comment.js";
 import { CommentLikes } from "../entities/comment_likes.js";
 import { Liked } from "../entities/liked.js";
+import { Saved } from "../entities/saved.js";
 
 
 const router = express.Router()
@@ -42,10 +43,12 @@ router.get("/comments/:idComment/responses", async (req, res) =>{
     return res.status(200).json(responses);
 });
 
-router.get("/",async (req, res) =>{
+router.get("/",AuthMiddleware,async (req, res) =>{
     const limit = req.query.limit;
     const page = req.query.page;
-    const collection = await postService.GetAllPost(limit, page);
+    const userId = req.user === null ? null : req.user.id;
+    console.log(req.user);
+    const collection = await postService.GetAllPost(limit, page, userId);
     if (collection.pagination.nextPage){
         const reqpath = req.path==="/" ? "" : req.path
         const nPage = Number(Number(req.query.page)+Number(1)) //javascript
@@ -58,7 +61,7 @@ router.get("/",async (req, res) =>{
     else{
         return res.status(200).json(collection);
     }
-}); 
+});     
 
 router.post("/:id/comment", AuthMiddleware, async (req,res)=> {
     if(req.user){
@@ -89,13 +92,13 @@ router.post("/:id/comment", AuthMiddleware, async (req,res)=> {
     
 });
 
-router.post("/:idPost/:idComment", AuthMiddleware, async (req,res)=> {
+router.post("/:idPost/comment/:idComment/like", AuthMiddleware, async (req,res)=> {
     const like = new CommentLikes(
         null,
         req.params.idComment,
         req.user    
     );
-    
+
     const inserted = await postService.InsertCommentLikes(like);
     if(inserted){
         return res.status(201).send();
@@ -106,7 +109,7 @@ router.post("/:idPost/:idComment", AuthMiddleware, async (req,res)=> {
     
 });
 
-router.delete("/:idPost/:idComment", AuthMiddleware, async (req,res)=> {
+router.delete("/:idPost/comment/:idComment/like", AuthMiddleware, async (req,res)=> {
     const like = new CommentLikes(
         null,
         req.params.idComment,
@@ -147,6 +150,38 @@ router.delete("/:id/like", AuthMiddleware, async (req,res)=> {
     ); 
     
     const deleted = await postService.DeleteLiked(like);
+    if(deleted){
+        return res.status(204).send();
+    }
+    else{
+        return res.status(400).send();
+    }
+});
+
+router.post("/:id/save", AuthMiddleware, async (req,res) => {
+    const saved = new Saved(
+        null,
+        req.params.id,
+        req.user.id
+    );
+
+    const inserted = await postService.InsertSaved(saved);
+    if(inserted){
+        return res.status(201).send();
+    }
+    else{
+        return res.status(400).send();
+    }
+});
+
+router.delete("/:id/save", AuthMiddleware, async(req, res) => {
+    const saved = new Saved(
+        null,
+        req.params.id,
+        req.user.id
+    );
+
+    const deleted = await postService.DeleteSaved(saved);
     if(deleted){
         return res.status(204).send();
     }

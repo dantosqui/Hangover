@@ -13,7 +13,6 @@ export const createToken = (user) => {
         expiresIn : '1h',
         issuer : 'localhost'
     };
-
     return jwt.sign(payload,secretKey,options);
 }
 
@@ -21,11 +20,10 @@ export const decryptToken = (encryptedToken) => {
     const secretKey = process.env.SECRET_KEY;
     let token = encryptedToken;
     let payloadOriginal = null;
-
     try {
         payloadOriginal = jwt.verify(token, secretKey);
     } catch(e) {
         console.error(e);
     }
-    return payloadOriginal
+    return payloadOriginal;
 };
