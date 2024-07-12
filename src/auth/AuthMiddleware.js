@@ -1,15 +1,15 @@
 import { decryptToken } from "./jwt.js";
 
 export function AuthMiddleware(req, res, next){
-    console.log("a:", req.headers.authorization);
-    const token = req.headers.authorization.split(' ')[1];
-    if(!token){
-        req.user = null;
-    }
-    else{
+    if(req.headers.authorization.length > ("Bearer").length){
+        const token = req.headers.authorization.split(' ')[1];
         const decryptedToken = decryptToken(token);
         req.user = decryptedToken;
     }
+    else{
+        req.user = null;
+    }
+    
 
     next();
 }

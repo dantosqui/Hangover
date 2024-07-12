@@ -47,7 +47,6 @@ router.get("/",AuthMiddleware,async (req, res) =>{
     const limit = req.query.limit;
     const page = req.query.page;
     const userId = req.user === null ? null : req.user.id;
-    console.log(req.user);
     const collection = await postService.GetAllPost(limit, page, userId);
     if (collection.pagination.nextPage){
         const reqpath = req.path==="/" ? "" : req.path
@@ -161,9 +160,11 @@ router.delete("/:id/like", AuthMiddleware, async (req,res)=> {
 router.post("/:id/save", AuthMiddleware, async (req,res) => {
     const saved = new Saved(
         null,
-        req.params.id,
-        req.user.id
+        req.user.id,
+        req.params.id
     );
+
+    console.log(saved);
 
     const inserted = await postService.InsertSaved(saved);
     if(inserted){
@@ -177,8 +178,8 @@ router.post("/:id/save", AuthMiddleware, async (req,res) => {
 router.delete("/:id/save", AuthMiddleware, async(req, res) => {
     const saved = new Saved(
         null,
-        req.params.id,
-        req.user.id
+        req.user.id,
+        req.params.id
     );
 
     const deleted = await postService.DeleteSaved(saved);

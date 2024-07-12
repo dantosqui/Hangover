@@ -98,7 +98,7 @@ export class PostRepository {
     }
 
     async getAllPost(limit, page, userId){
-        page=page-1
+        page=page-1;
         let query = `
             SELECT
             p.id,
@@ -206,8 +206,8 @@ export class PostRepository {
     }
 
     async insertSaved(saved){
-        const query = "INSERT INTO saved (user_id, post_id) VALUES ($1, $2)";
-        const values = [saved.user_id, saved.post_id];
+        const query = "INSERT INTO saved (post_id, user_id) VALUES ($1, $2)";
+        const values = [saved.post_id, saved.user_id];
         try{
             const inserted = await this.DBClient.query(query, values);
             return inserted.rowCount > 0;
@@ -219,7 +219,7 @@ export class PostRepository {
     }
 
     async deleteSaved(saved){
-        const query = "DELETE FROM saved WHERE user_id=$1 AND post_id=$2)";
+        const query = "DELETE FROM saved WHERE user_id=$1 AND post_id=$2";
         const values = [saved.user_id, saved.post_id];
         try{
             const deleted = await this.DBClient.query(query, values);
