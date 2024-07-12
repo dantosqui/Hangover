@@ -48,6 +48,7 @@ router.get("/",AuthMiddleware,async (req, res) =>{
     const page = req.query.page;
     const userId = req.user === null ? null : req.user.id;
     const collection = await postService.GetAllPost(limit, page, userId);
+    
     if (collection.pagination.nextPage){
         const reqpath = req.path==="/" ? "" : req.path
         const nPage = Number(Number(req.query.page)+Number(1)) //javascript
