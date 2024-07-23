@@ -16,7 +16,7 @@ router.get("/:id", async (req, res) => {
     const offsetComments=req.query.offsetComments
     const post = await postService.GetPostById(idPost);
     const comments = await postService.GetCommentsPost(idPost,limitComments,offsetComments);
-    //const likedByUser = await postService.GetLikedByUser();
+    
 
     if (post===null){
         return res.status(404).send();
@@ -130,7 +130,7 @@ router.post("/:id/like", AuthMiddleware, async (req,res)=> {
     const like = new Liked(
         null,
         req.params.id,
-        req.user
+        req.user.id
     ); 
 
     const inserted = await postService.InsertLiked(like);
@@ -165,7 +165,6 @@ router.post("/:id/save", AuthMiddleware, async (req,res) => {
         req.params.id
     );
 
-    console.log(saved);
 
     const inserted = await postService.InsertSaved(saved);
     if(inserted){
@@ -175,6 +174,7 @@ router.post("/:id/save", AuthMiddleware, async (req,res) => {
         return res.status(400).send();
     }
 });
+
 
 router.delete("/:id/save", AuthMiddleware, async(req, res) => {
     const saved = new Saved(

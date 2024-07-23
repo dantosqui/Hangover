@@ -11,6 +11,8 @@ export default class PostsService {
         return post;
     }
 
+    
+
     async GetCommentsPost(id, limit, page){
         const comments = await this.bd.getCommentsPost(id,limit,page);
         return comments;
