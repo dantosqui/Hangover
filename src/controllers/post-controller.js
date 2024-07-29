@@ -48,6 +48,20 @@ router.get("/comments/:idComment/responses", async (req, res) =>{
     const responses = await postService.GetResponsesComment(idComment, limitResponses, page);
     return res.status(200).json(responses);
 });
+router.get("/:id/like/fetch"), async (req,res) =>{
+    var filters ={
+        "post_id": req.params.id,
+        "user_id":req.user.id
+    }
+const isLiked = await postService.IsLiked(filters)
+if(isLiked){
+    return res.status(201).send();
+}else{
+    
+    return res.status(404).send();
+    
+}
+}
 
 router.get("/",AuthMiddleware,async (req, res) =>{
     const limit = req.query.limit;
@@ -135,11 +149,11 @@ router.delete("/:idPost/comment/:idComment/like", AuthMiddleware, async (req,res
 router.post("/:id/like", AuthMiddleware, async (req,res)=> {
     const like = new Liked(
         null,
-        req.params.id,
-        req.user.id
+        req.user.id,
+        req.params.id
     ); 
-
     const inserted = await postService.InsertLiked(like);
+    
     if(inserted){
         return res.status(201).send();
     }

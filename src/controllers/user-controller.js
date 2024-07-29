@@ -90,4 +90,10 @@ router.get("/library",AuthMiddleware,async (req,res) => {
     return res.status(200).json(saved)
 })
 
+router.get("/profile/:id", AuthMiddleware,async (req, res) => {
+    const id = req.params.id;
+    const info = await userService.getTotalUserInfo(req.user, id);
+    return res.status(200).json(info);
+});
+
 export default router;

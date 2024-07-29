@@ -175,10 +175,22 @@ export class PostRepository {
             return false;
         }
     }
-
+async isLiked(filters){
+    
+    const query = "SELECT * FROM LIKED WHERE user_id = $1 and post_id = $2"
+    const values = [filters.user_id, filters.post_id]
+    try{
+const likes = await this.DBClient.query(query,values)
+return likes.rowCount>0;
+    }catch(error){
+        console.error("ERROR BUSCANDO LIKES FILTRADOS: ",error)
+        return false;
+    }
+}
     async insertLiked(like){
         const query = "INSERT INTO liked (user_id, post_id) VALUES ($1, $2)";
         const values = [like.user_id, like.post_id];
+        console.log("HOLAAA ACA!!!!" + like.post_id)
         try{
             const inserted = await this.DBClient.query(query, values);
             return inserted.rowCount > 0;

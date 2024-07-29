@@ -5,7 +5,10 @@ export default class PostsService {
     constructor (){
         this.bd = new PostRepository();
     }
-
+async IsLiked(filters){
+    const isLiked = await this.bd.isLiked(filters);
+    return isLiked;
+}
     async GetPostById(id) {
         const post = await this.bd.getPostById(id);
         return post;

@@ -7,9 +7,9 @@ INSERT INTO visibilities (visibility) VALUES ('public'), ('private'), ('friends'
 -- Insert into users
 INSERT INTO users (username, first_name, last_name, email, password, date_of_birth, description, profile_photo, role_id)
 VALUES
-('user1', 'John', 'Doe', 'john.doe@example.com', 'password1', '1990-01-01', 'Description 1', 'photo1.jpg', 1),
-('user2', 'Jane', 'Doe', 'jane.doe@example.com', 'password2', '1992-02-02', 'Description 2', 'photo2.jpg', 2),
-('user3', 'Jim', 'Beam', 'jim.beam@example.com', 'password3', '1994-03-03', 'Description 3', 'photo3.jpg', 3);
+('user1', 'John', 'Doe', 'john.doe@example.com', 'password1', '1990-01-01', 'Description 1', 'https://randomuser.me/api/portraits/men/37.jpg', 1),
+('user2', 'Jane', 'Doe', 'jane.doe@example.com', 'password2', '1992-02-02', 'Description 2', 'https://randomuser.me/api/portraits/men/66.jpg', 2),
+('user3', 'Jim', 'Beam', 'jim.beam@example.com', 'password3', '1994-03-03', 'Description 3', 'https://randomuser.me/api/portraits/women/2.jpg', 3);
 
 -- Insert into posts
 INSERT INTO posts (creator_id, title, description, allow_comments, visibility_id, parent_id, likes, remixable, date_posted, front_image, back_image)

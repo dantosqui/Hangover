@@ -22,7 +22,12 @@ export class UsersService{
     }
 
     async getSavedLikedPosts(userId){
-        const posts = await this.bd.getSavedLikedPosts(userId)
-        return posts
+        const posts = await this.bd.getSavedLikedPosts(userId);
+        return posts;
+    }
+
+    async getTotalUserInfo(ownUser, userId){
+        const info = await this.bd.getTotalUserInfo(ownUser, userId);
+        return info;
     }
 }
