@@ -18,6 +18,12 @@ export default class PostsService {
         return comments;
     }
 
+    async isLikedSaved(idPost,idUser) {
+        const liked = await this.bd.isLikedByUser(idUser,idPost)
+        const saved = await this.bd.isSavedByUser(idUser,idPost)
+        return [liked,saved]
+    }
+
     async GetResponsesComment(idComment, limit, page){
         const responses = await this.bd.getResponsesComment(idComment, limit, page);
         return responses;

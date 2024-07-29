@@ -231,6 +231,41 @@ export class PostRepository {
         }
     }
 
+    async isLikedByUser(idUser, idPost) {
+        try {
+          const query = `
+            SELECT COUNT(*) AS count
+            FROM liked
+            WHERE user_id = $1 AND post_id = $2
+          `;
+          const result = await this.DBClient.query(query, [idUser, idPost]);
+      
+          return result.rowCount > 0;
+        } catch (error) {
+          console.error("Error checking if post is liked by user:", error);
+          throw error;
+        }
+      }
+
+      async isSavedByUser(idUser, idPost) {
+        try {
+          const query = `
+            SELECT COUNT(*) AS count
+            FROM saved
+            WHERE user_id = $1 AND post_id = $2
+          `;
+      
+          const result = await this.DBClient.query(query, [idUser, idPost]);
+      
+          return result.rowCount > 0;
+        } catch (error) {
+          console.error("Error checking if post is saved by user:", error);
+          throw error;
+        }
+      }
+      
+      
+
 
 
 }
