@@ -100,11 +100,17 @@ router.get("/profile/:id", AuthMiddleware,async (req, res) => {
 
 router.post("/follow/:id",AuthMiddleware,async (req,res) => {
     if (req.user == null){
-        console.error("el usuario no esta autenticificado")
+        return res.status(401).json("el usuario no esta autenticificado")
     }
     const id = req.params.id
     const r = await userService.postFollow(req.user.id,id)
-    return r
+    return res.status(201).json(r)
+})
+
+router.delete("/follow/:id",AuthMiddleware,async(req,res) => {
+    const id=req.params.id
+    const r = await userService.deleteFollow(req.user.id,id)
+    return res.status(200).json(r)
 })
 
 export default router;

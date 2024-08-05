@@ -48,19 +48,7 @@ router.get("/comments/:idComment/responses", async (req, res) =>{
     const responses = await postService.GetResponsesComment(idComment, limitResponses, page);
     return res.status(200).json(responses);
 });
-router.get("/:id/like/fetch", AuthMiddleware,async (req, res) => {
-    var filters = {
-        "post_id": req.params.id,
-        "user_id": req.user.id
-    }
-   
-    const isLiked = await postService.IsLiked(filters)
-    if(isLiked){
-        return res.status(201).send();
-    } else {
-        return res.status(404).send();
-    }
-});
+
 router.get("/",AuthMiddleware,async (req, res) =>{
     const limit = req.query.limit;
     const page = req.query.page;
@@ -160,22 +148,24 @@ router.post("/:id/like", AuthMiddleware, async (req,res)=> {
     }
 });
 
-router.delete("/:id/like", AuthMiddleware, async (req,res)=> {
-    const like = new Liked(
-        null,
-        req.params.id,
-        req.user
-    ); 
-    
-    const deleted = await postService.DeleteLiked(like);
-    if(deleted){
-        return res.status(204).send();
-    }
-    else{
-        return res.status(400).send();
+router.delete("/:id/like", AuthMiddleware, async (req, res) => {
+    try {
+        const like = {
+            user_id: req.user.id,
+            post_id: req.params.id
+        };
+        
+        const deleted = await postService.DeleteLiked(like);
+        if (deleted) {
+            return res.status(200).json({ message: "Like removed successfully" });
+        } else {
+            return res.status(404).json({ error: "Like not found" });
+        }
+    } catch (error) {
+        console.error("Error removing like:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
 });
-
 router.post("/:id/save", AuthMiddleware, async (req,res) => {
     const saved = new Saved(
         null,

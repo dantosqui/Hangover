@@ -72,9 +72,6 @@ async IsLiked(filters){
         return saved;
     }
     
-    async postFollow(ownId,followId) {
-        const inserted = await this.bd.insertFollow(ownId,followId)
-        return inserted
-    }
+    
 
 }

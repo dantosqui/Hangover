@@ -30,4 +30,14 @@ export class UsersService{
         const info = await this.bd.getTotalUserInfo(ownUser, userId);
         return info;
     }
+    async postFollow(ownId,followId) {
+        const inserted = await this.bd.insertFollow(ownId,followId)
+        return inserted
+    }
+    async deleteFollow(ownId,followId){
+        const inserted = await this.bd.deleteFollow(ownId,followId)
+        return inserted
+    }
 }
+
+

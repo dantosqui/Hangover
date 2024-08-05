@@ -146,18 +146,7 @@ export class PostRepository {
         }
         
     }
-    async insertFollow(ownId,followId){ // this no checkea si el usuario ya lo sigue o no asi q ojo
-        const query = " inserT INTO user_relationships (follower_id, followed_id) values ($1,$2)"
-        const values = [ownId,followId]
-        try{
-            const inserted = await this.DBClient.query(query,values)
-            return inserted.rowCount>0
-        }
-        catch (error){
-            console.error("Error capturado: ",error)
-        }
-    }
-
+    
     async insertCommentLikes(like){
         const query = "INSERT INTO comment_likes (comment_id, user_id) VALUES ($1, $2)";
         const values = [like.comment_id, like.user_id];
@@ -213,21 +202,18 @@ return likes.rowCount>0;
             return false;
         }
     }
-
-    async deleteLiked(like){
+    async deleteLiked(like) {
         const query = "DELETE FROM liked WHERE user_id = $1 AND post_id = $2";
         const values = [like.user_id, like.post_id];
-        try{
-            const deleted = await this.DBClient.query(query, values);
-            return deleted.rowCount > 0;
-        } catch(error) {
-            console.error("Error capturado:", error);
-
-            // Devolver un código de estado 500
-            return false;
+        try {
+            const result = await this.DBClient.query(query, values);
+            console.log("Delete result:", result);  // Para depuración
+            return result.rowCount > 0;
+        } catch (error) {
+            console.error("Error deleting like:", error);
+            throw error;  // Propaga el error para que pueda ser manejado en el controlador
         }
     }
-
     async insertSaved(saved){
         const query = "INSERT INTO saved (post_id, user_id) VALUES ($1, $2)";
         const values = [saved.post_id, saved.user_id];
@@ -257,12 +243,12 @@ return likes.rowCount>0;
     async isLikedByUser(idUser, idPost) {
         try {
           const query = `
-            SELECT COUNT(*) AS count
+            SELECT *
             FROM liked
             WHERE user_id = $1 AND post_id = $2
           `;
           const result = await this.DBClient.query(query, [idUser, idPost]);
-      
+      console.log(result.rowCount," EL QUE SE LLAMA Y LEE DANTE PUTO ES EL")
           return result.rowCount > 0;
         } catch (error) {
           console.error("Error checking if post is liked by user:", error);

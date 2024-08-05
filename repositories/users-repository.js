@@ -143,7 +143,8 @@ export class UserRepository {
             FROM users
             WHERE users.id = $2;
             `;
-            const values = [ownId === null ? null : ownId.id, userId];
+            const values = [ownId === null ? null : ownId.id, parseInt(userId)];
+            console.log(ownId,userId, "ownid,userid", values, "values")
             const info = await this.DBClient.query(query, values);
             console.log("holaaa")
             return info.rows[0];
@@ -152,4 +153,28 @@ export class UserRepository {
             console.error(e);
         }
     }
+
+    async insertFollow(ownId,followId){ // this no checkea si el usuario ya lo sigue o no asi q ojo
+        const query = " inserT INTO user_relationships (follower_id, followed_id) values ($1,$2)"
+        const values = [ownId,followId]
+        try{
+            const inserted = await this.DBClient.query(query,values)
+            return inserted.rowCount>0
+        }
+        catch (error){
+            console.error("Error capturado: ",error)
+        }
+    }
+    async deleteFollow(ownId,followId){
+        const query = "delete from user_relationships where follower_id=$1 and followed_id=$2"
+        const values=[ownId,followId]
+        try{
+            const inserted = await this.DBClient.query(query,values)
+            return inserted.rowcount>0
+        }
+        catch (error){
+            console.error("error capturado: ",error)
+        }
+    }
+
 }
