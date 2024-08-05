@@ -17,7 +17,6 @@ export class UserRepository {
             const response = await this.DBClient.query(query, values);
             if(response.rowCount > 0){
                 const token = createToken(response.rows);
-                console.log(token);
                 return [true, token, 200];
             }
             else{
@@ -117,6 +116,7 @@ export class UserRepository {
                     json_build_object(
                         'id', posts.id,
                         'title', posts.title,
+                        'image',posts.front_image,
                         'saved', (
                             SELECT EXISTS(
                                 SELECT 1 
@@ -144,9 +144,7 @@ export class UserRepository {
             WHERE users.id = $2;
             `;
             const values = [ownId === null ? null : ownId.id, parseInt(userId)];
-            console.log(ownId,userId, "ownid,userid", values, "values")
             const info = await this.DBClient.query(query, values);
-            console.log("holaaa")
             return info.rows[0];
         }
         catch(e){

@@ -10,7 +10,7 @@ export const createToken = (user) => {
     const secretKey = process.env.SECRET_KEY;
 
     const options = {
-        expiresIn : '1h',
+        expiresIn : '30d',
         issuer : 'localhost'
     };
     return jwt.sign(payload,secretKey,options);

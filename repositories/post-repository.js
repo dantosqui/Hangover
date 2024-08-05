@@ -190,7 +190,6 @@ return likes.rowCount>0;
     async insertLiked(like){
         const query = "INSERT INTO liked (user_id, post_id) VALUES ($1, $2)";
         const values = [like.user_id, like.post_id];
-        console.log("HOLAAA ACA!!!!" + like.post_id)
         try{
             const inserted = await this.DBClient.query(query, values);
             return inserted.rowCount > 0;
@@ -207,7 +206,6 @@ return likes.rowCount>0;
         const values = [like.user_id, like.post_id];
         try {
             const result = await this.DBClient.query(query, values);
-            console.log("Delete result:", result);  // Para depuración
             return result.rowCount > 0;
         } catch (error) {
             console.error("Error deleting like:", error);
@@ -248,7 +246,6 @@ return likes.rowCount>0;
             WHERE user_id = $1 AND post_id = $2
           `;
           const result = await this.DBClient.query(query, [idUser, idPost]);
-      console.log(result.rowCount," EL QUE SE LLAMA Y LEE DANTE PUTO ES EL")
           return result.rowCount > 0;
         } catch (error) {
           console.error("Error checking if post is liked by user:", error);
