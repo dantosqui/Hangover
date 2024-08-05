@@ -139,12 +139,14 @@ export class UserRepository {
                     WHERE follower_id = $1 
                     AND followed_id = users.id
                 )
-            ) AS follows
+            ) AS follows,
+            ($1) AS own_id
             FROM users
             WHERE users.id = $2;
             `;
             const values = [ownId === null ? null : ownId.id, parseInt(userId)];
             const info = await this.DBClient.query(query, values);
+            console.log(info.rows[0]);
             return info.rows[0];
         }
         catch(e){
