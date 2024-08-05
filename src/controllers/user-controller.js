@@ -96,4 +96,15 @@ router.get("/profile/:id", AuthMiddleware,async (req, res) => {
     return res.status(200).json(info);
 });
 
+
+
+router.post("/follow/:id",AuthMiddleware,async (req,res) => {
+    if (req.user == null){
+        console.error("el usuario no esta autenticificado")
+    }
+    const id = req.params.id
+    const r = await userService.postFollow(req.user.id,id)
+    return r
+})
+
 export default router;

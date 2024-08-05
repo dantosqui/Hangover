@@ -71,5 +71,10 @@ async IsLiked(filters){
         const deleted = await this.bd.deleteSaved(saved);
         return saved;
     }
+    
+    async postFollow(ownId,followId) {
+        const inserted = await this.bd.insertFollow(ownId,followId)
+        return inserted
+    }
 
 }

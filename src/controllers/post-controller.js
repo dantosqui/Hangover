@@ -48,21 +48,19 @@ router.get("/comments/:idComment/responses", async (req, res) =>{
     const responses = await postService.GetResponsesComment(idComment, limitResponses, page);
     return res.status(200).json(responses);
 });
-router.get("/:id/like/fetch"), async (req,res) =>{
-    var filters ={
+router.get("/:id/like/fetch", AuthMiddleware,async (req, res) => {
+    var filters = {
         "post_id": req.params.id,
-        "user_id":req.user.id
+        "user_id": req.user.id
     }
-const isLiked = await postService.IsLiked(filters)
-if(isLiked){
-    return res.status(201).send();
-}else{
-    
-    return res.status(404).send();
-    
-}
-}
-
+   
+    const isLiked = await postService.IsLiked(filters)
+    if(isLiked){
+        return res.status(201).send();
+    } else {
+        return res.status(404).send();
+    }
+});
 router.get("/",AuthMiddleware,async (req, res) =>{
     const limit = req.query.limit;
     const page = req.query.page;

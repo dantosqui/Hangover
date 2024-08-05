@@ -146,6 +146,17 @@ export class PostRepository {
         }
         
     }
+    async insertFollow(ownId,followId){ // this no checkea si el usuario ya lo sigue o no asi q ojo
+        const query = " inserT INTO user_relationships (follower_id, followed_id) values ($1,$2)"
+        const values = [ownId,followId]
+        try{
+            const inserted = await this.DBClient.query(query,values)
+            return inserted.rowCount>0
+        }
+        catch (error){
+            console.error("Error capturado: ",error)
+        }
+    }
 
     async insertCommentLikes(like){
         const query = "INSERT INTO comment_likes (comment_id, user_id) VALUES ($1, $2)";
