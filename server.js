@@ -14,17 +14,24 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',  // Ajusta el origen según tu configuración
+    methods: ['GET', 'POST']
+  }
+});
 
-app.use(cors()); // Configura CORS
+app.use(cors({
+  origin: 'http://localhost:3000'
+})); // Configura CORS
 app.use(express.json());    
+app.use(express.urlencoded({ extended: true }));
 const port = 3508;
 
 // Configura las rutas para la API REST
 app.use("/post", PostsController);
 app.use("/user", UsersController);
 
-let users;
 const chatCtrl = new chatController();
 
 // Usa el directorio actual para servir archivos estáticos
@@ -44,13 +51,17 @@ app.get('/privateChat/:id1/:id2', async (req, res) => {
 });
 
 io.on('connection', async (socket) => {
-    if (users !== undefined) {
+
+    if (true) {
+      
+      socket.on('set users', async (data) => {
+      let { users } = data;
+      console.log(typeof users[0]);
+      socket.users = users; // Almacenar los usuarios en el socket
       await chatCtrl.checkChat(users);
-      socket.userID = users[0];
-
       // Enviar el socket.userID al cliente recién conectado
-      socket.emit('user connected', { userID: socket.userID });
-
+      socket.emit('user connected', { userID: users[0] })
+      
       socket.on('chat message', async (data) => {
         const mensaje = data.mensaje;
 
@@ -76,6 +87,7 @@ io.on('connection', async (socket) => {
           console.error(e);
         }
       }
+    });
     }
   });
   

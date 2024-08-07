@@ -7,7 +7,6 @@ class chatController {
 
     async checkChat(users) {
         const exists = await this.chatService.checkChat(users[0], users[1]);
-        console.log("holaaaaaaaax2");   
     };
 
     async recoverChat(users) {

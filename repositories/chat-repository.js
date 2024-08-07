@@ -27,6 +27,7 @@ class ChatRepository {
 
     async checkChat(id1, id2) {
         let result = await this.getChatId(id1, id2);
+        
         if (result === null) {
             let query = "INSERT INTO chats (name) VALUES (null) RETURNING id";
             result = await this.DBClient.query(query);
