@@ -30,11 +30,11 @@ const chatCtrl = new chatController();
 // Usa el directorio actual para servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('//privateChat/:id1/:id2', async (req, res) => {
+app.get('/privateChat/:id1/:id2', async (req, res) => {
   const id1 = req.params.id1;
   const id2 = req.params.id2;
   users = [id1, id2];
-
+  console.log("hola12");
   try {
     res.sendFile(path.join(__dirname, 'index.html'));
   } catch (error) {
