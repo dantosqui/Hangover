@@ -7,6 +7,8 @@ import path from 'path';
 import url from 'url';
 import { Server } from 'socket.io';
 import chatController from './src/controllers/chat-controller.js';
+import { AuthMiddleware } from './src/auth/authMiddleware.js';
+import { decryptToken } from './src/auth/jwt.js';
 
 // Obtener la ruta del directorio actual
 const __filename = url.fileURLToPath(import.meta.url);
@@ -37,9 +39,13 @@ const chatCtrl = new chatController();
 // Usa el directorio actual para servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/privateChat/:id1/:id2', async (req, res) => {
+app.get('/privateChat/:id1/:id2',AuthMiddleware, async (req, res) => {
+  console.log("Holaaa");
   const id1 = req.params.id1;
   const id2 = req.params.id2;
+  if(id1 != req.user.id){
+    return res.status(401).send();
+  }
   users = [id1, id2];
   console.log("hola12");
   try {
@@ -50,12 +56,39 @@ app.get('/privateChat/:id1/:id2', async (req, res) => {
   }
 });
 
+io.use((socket, next) => {
+  const token = socket.handshake.query.token;
+  if(token !== ""){
+      // Verifica el token
+      const decoded = decryptToken(token);
+      socket.user = decoded;
+  }
+  else{
+    socket.user = undefined;
+  }
+  next();
+});
+
 io.on('connection', async (socket) => {
 
     if (true) {
       
       socket.on('set users', async (data) => {
       let { users } = data;
+      if(socket.user === undefined){
+        socket.emit('error', { message: 'Sesion finalizada' });
+        // Desconectar el socket
+        socket.disconnect();
+        return;
+      }
+      if (users[0] != socket.user.id) {
+        // Enviar un mensaje de error al cliente
+        socket.emit('error', { message: 'ID de usuario no válido' });
+        // Desconectar el socket
+        socket.disconnect();
+        return;
+      }
+      
       console.log(typeof users[0]);
       socket.users = users; // Almacenar los usuarios en el socket
       await chatCtrl.checkChat(users);

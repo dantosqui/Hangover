@@ -75,13 +75,15 @@ const checkBirthDate = (date) => {
 }
 
 router.get("/", AuthMiddleware, async (req, res) => {
+    console.log(req.user);
     const user = await userService.GetUserById(req.user.id);
+    
     if(user === null){
         return res.status(404).send("No existe el usuario");
     }
     else{
         return res.status(200).json(user);
-    }
+    }                             
 });
 
 router.get("/library",AuthMiddleware,async (req,res) => {
