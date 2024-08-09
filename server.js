@@ -61,7 +61,6 @@ io.on('connection', async (socket) => {
       await chatCtrl.checkChat(users);
       // Enviar el socket.userID al cliente recién conectado
       socket.emit('user connected', { userID: users[0] })
-      
       socket.on('chat message', async (data) => {
         const mensaje = data.mensaje;
 

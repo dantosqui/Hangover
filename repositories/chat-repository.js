@@ -9,15 +9,25 @@ class ChatRepository {
     }
 
     async getChatId(id1, id2) {
+        console.log("iddd: ", id2)
         const query = `
-        SELECT chat_id 
-        FROM chat_members 
-        WHERE user_id IN ($1, $2) 
-        GROUP BY chat_id 
-        HAVING COUNT(*) = 2
+            SELECT chat_id
+FROM chat_members
+WHERE user_id IN ($1, $2)
+GROUP BY chat_id
+HAVING COUNT(DISTINCT user_id) = 2
+   AND COUNT(*) = (
+       SELECT COUNT(*)
+       FROM chat_members cm2
+       WHERE cm2.chat_id = chat_members.chat_id
+   );
+
+
+
         `;
 
         const result = await this.DBClient.query(query, [id1, id2]);
+        console.log(result.rows);
         if (result.rows.length > 0) {
             return result.rows[0].chat_id;
         } else {
@@ -27,7 +37,7 @@ class ChatRepository {
 
     async checkChat(id1, id2) {
         let result = await this.getChatId(id1, id2);
-        
+        console.log("resultado:", result);
         if (result === null) {
             let query = "INSERT INTO chats (name) VALUES (null) RETURNING id";
             result = await this.DBClient.query(query);
@@ -49,6 +59,7 @@ class ChatRepository {
 
     async recoverChat(id1, id2) {
         let result = await this.getChatId(id1, id2);
+        console.log("resultx2: ", result);
         if (result !== null) {
             const query = "SELECT * FROM messages WHERE chat_id = $1 AND date_sent < CURRENT_TIMESTAMP";
             const messages = await this.DBClient.query(query, [result]);
