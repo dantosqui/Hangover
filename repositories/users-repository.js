@@ -66,8 +66,8 @@ export class UserRepository {
     }
     async getSavedLikedPosts(userId){
         try{
-            const queryLiked="SELECT posts.* FROM posts INNER JOIN liked on liked.post_id=posts.id where liked.user_id=$1"
-            const querySaved="SELECT posts.* FROM posts INNER JOIN saved on saved.post_id=posts.id where saved.user_id=$1"
+            const queryLiked="SELECT posts.*, users.* FROM posts INNER JOIN users on users.id=posts.creator_id INNER JOIN liked on liked.post_id=posts.id where liked.user_id=$1 "
+            const querySaved="SELECT posts.*, users.* FROM posts INNER JOIN users on users.id=posts.creator_id INNER JOIN saved on saved.post_id=posts.id where saved.user_id=$1 "
 
             const liked = await this.DBClient.query(queryLiked,[userId])
             const saved = await this.DBClient.query(querySaved,[userId])
