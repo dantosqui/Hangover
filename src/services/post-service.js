@@ -71,6 +71,12 @@ async IsLiked(filters){
         const deleted = await this.bd.deleteSaved(saved);
         return saved;
     }
+
+    async canComment(postId){
+        const val = await this.bd.puedeComentar(postId)
+        console.log("puede comentar?: " + val)
+        return val;
+    }
     
     
 

@@ -270,7 +270,12 @@ return likes.rowCount>0;
         }
       }
       
-      
+      async puedeComentar(postId){
+        const query = "SELECT allow_comments FROM posts WHERE id = $1"
+        const result = await this.DBClient.query(query, [postId]);
+        console.log("este es el result: "+ result.rows[0].allow_comments)
+        return result.rows[0].allow_comments;
+      }
 
 
 

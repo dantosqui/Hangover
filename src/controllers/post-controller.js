@@ -9,36 +9,39 @@ import { Saved } from "../entities/saved.js";
 
 const router = express.Router()
 const postService = new PostService()
-
 router.get("/:id", AuthMiddleware, async (req, res) => {
-    
-    const idPost=req.params.id;
-    const limitComments=req.query.limitComments
-    const offsetComments=req.query.offsetComments
+    const idPost = req.params.id;
+    const limitComments = req.query.limitComments;
+    const offsetComments = req.query.offsetComments;
     const post = await postService.GetPostById(idPost);
-    const comments = await postService.GetCommentsPost(idPost,limitComments,offsetComments);
-    let liked=false
-    let saved=false
-    if (req.user!=null) 
-    {
-        [liked,saved] = await postService.isLikedSaved(idPost,req.user.id)
-    }
 
-    if (post===null){
+    if (post === null) {
         return res.status(404).send();
     }
-    else{
-        return res.status(200).json([post, comments,liked,saved]);
+
+    const canComment = await postService.canComment(idPost);
+    const comments = canComment ? await postService.GetCommentsPost(idPost, limitComments, offsetComments) : [];
+
+    let liked = false;
+    let saved = false;
+    if (req.user != null) 
+    {
+        [liked, saved] = await postService.isLikedSaved(idPost, req.user.id);
     }
 
+    return res.status(200).json({ post, comments, liked, saved, canComment });
 });
 
 router.get("/:id/comments", async (req, res) => {
     const idPost=req.params.id;
     const limitComments = req.query.limit;
     const page = req.query.page-1;
-    const comments = await postService.GetCommentsPost(idPost, limitComments, page);
-    return res.status(200).json(comments);
+    var comments = null;
+    const canComment = await postService.canComment(idPost);
+    if(canComment == true){
+        comments = await postService.GetCommentsPost(idPost,limitComments,offsetComments);
+    }
+        return res.status(200).json(comments);
 });
 
 router.get("/comments/:idComment/responses", async (req, res) =>{
