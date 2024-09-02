@@ -2,6 +2,7 @@ import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 import  Pagination  from '../src/entities/pagination.js';
 
+
 export class PostRepository {
     constructor() {
         const { Client } = pg;
@@ -9,6 +10,7 @@ export class PostRepository {
         this.DBClient.connect();
     }
 
+    
     async getPostById(id){
         
         const query = 
@@ -96,6 +98,63 @@ export class PostRepository {
         return Pagination.BuildPagination(responses, limit, page, total_responses_comment);
 
     }
+    async SearchPosts(query, limit, page) {
+        const searchQuery = `%${query}%`;
+        const offset = (page - 1) * limit;
+    
+        const sql = `
+            SELECT 
+                p.id AS post_id,
+                p.title,
+                p.description,
+                p.date_posted,
+                p.likes,
+                p.front_image,
+                p.back_image,
+                u.username,
+                COUNT(pt.tag_id) AS tag_count,
+                (CASE
+                    WHEN u.username LIKE $1 THEN 4
+                    WHEN p.title LIKE $1 THEN 3
+                    WHEN p.description LIKE $1 THEN 1
+                    ELSE 0
+                END) AS relevance
+            FROM posts p
+            JOIN users u ON p.creator_id = u.id
+            LEFT JOIN post_tag pt ON p.id = pt.post_id
+            WHERE 
+                u.username LIKE $1 
+                OR p.title LIKE $1 
+                OR p.description LIKE $1
+            GROUP BY p.id, u.username
+            ORDER BY relevance DESC
+            LIMIT $2 OFFSET $3
+        `;
+    
+        try {
+            const result = await this.DBClient.query(sql, [searchQuery, limit, offset]);
+            
+            // Contar el total de resultados que coinciden con la búsqueda
+            const countQuery = `
+                SELECT COUNT(DISTINCT p.id) AS total
+                FROM posts p
+                JOIN users u ON p.creator_id = u.id
+                LEFT JOIN post_tag pt ON p.id = pt.post_id
+                WHERE 
+                    u.username LIKE $1 
+                    OR p.title LIKE $1 
+                    OR p.description LIKE $1
+            `;
+            const countResult = await this.DBClient.query(countQuery, [searchQuery]);
+            const total = countResult.rows[0].total;
+            return Pagination.BuildPagination(result.rows, limit, page, total);
+        } catch (error) {
+            console.error("Error fetching search results:", error);
+            throw error; // Puedes lanzar el error para que lo maneje el controlador o middleware
+        }
+    }
+    
+    
 
     async getAllPost(limit, page, userId){
         page=page-1;
@@ -124,10 +183,11 @@ export class PostRepository {
             LIMIT $2 OFFSET $3;
             `;
         const collection = (await this.DBClient.query(query, [userId, limit, page*limit])).rows;
-
+                
         query = "SELECT COUNT(id) AS total FROM posts";
         const total = (await this.DBClient.query(query)).rows[0].total;
-                
+        
+        
         return Pagination.BuildPagination(collection, limit, page, total);
         
     }
@@ -190,6 +250,7 @@ return likes.rowCount>0;
     async insertLiked(like){
         const query = "INSERT INTO liked (user_id, post_id) VALUES ($1, $2)";
         const values = [like.user_id, like.post_id];
+       
         try{
             const inserted = await this.DBClient.query(query, values);
             return inserted.rowCount > 0;

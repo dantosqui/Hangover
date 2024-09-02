@@ -42,8 +42,8 @@ router.get("/:id/comments", async (req, res) => {
         comments = await postService.GetCommentsPost(idPost,limitComments,offsetComments);
     }
         return res.status(200).json(comments);
-});
-
+    });
+    
 router.get("/comments/:idComment/responses", async (req, res) =>{
     const idComment = req.params.idComment;
     const limitResponses = req.query.limit;
@@ -51,6 +51,24 @@ router.get("/comments/:idComment/responses", async (req, res) =>{
     const responses = await postService.GetResponsesComment(idComment, limitResponses, page);
     return res.status(200).json(responses);
 });
+
+router.get("/search/:searchQuery", async (req, res) => {
+    const limit = req.query.limit;
+    const page = req.query.page;
+    const query = req.params.searchQuery;  // Asegúrate de que este nombre coincide con el del frontend
+    const collection = await postService.SearchPosts(query, limit, page);
+    if (collection.pagination.nextPage){
+        const reqpath = req.path==="/" ? "" : req.path
+        const nPage = Number(Number(req.query.page)+Number(1)) //javascript
+        let nextPage="http://"+req.get('host') + req.baseUrl + reqpath+"/?limit="+req.query.limit+"&page="+nPage
+        collection.pagination.nextPage=nextPage
+    }
+    if (collection === null) {
+      return res.status(404).send();
+    } else {
+      return res.status(200).json(collection);
+    }
+  });
 
 router.get("/",AuthMiddleware,async (req, res) =>{
     const limit = req.query.limit;

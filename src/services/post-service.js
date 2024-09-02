@@ -14,7 +14,10 @@ async IsLiked(filters){
         return post;
     }
 
-    
+async SearchPosts(query, limit, page){
+    const results = await this.bd.SearchPosts(query, limit, page);
+    return results
+}
 
     async GetCommentsPost(id, limit, page){
         const comments = await this.bd.getCommentsPost(id,limit,page);

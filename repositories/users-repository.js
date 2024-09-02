@@ -9,7 +9,7 @@ export class UserRepository {
         this.DBClient = new Client(DBConfig);
         this.DBClient.connect();
     }
-
+    
     async getUser(username, password) {
         try {
             const query = "SELECT id FROM users WHERE username = $1 AND password = $2"; 
@@ -64,16 +64,15 @@ export class UserRepository {
             console.log(e);
         }
     }
-    async getSavedLikedPosts(userId){
+    async getSavedLikedPosts(userId){//NO SE OBTIENE LA FOTO DE PERFIL!!!! DEL CREADOR
         try{
-            const queryLiked="SELECT posts.*, users.* FROM posts INNER JOIN users on users.id=posts.creator_id INNER JOIN liked on liked.post_id=posts.id where liked.user_id=$1 "
-            const querySaved="SELECT posts.*, users.* FROM posts INNER JOIN users on users.id=posts.creator_id INNER JOIN saved on saved.post_id=posts.id where saved.user_id=$1 "
-
+            const queryLiked="SELECT posts.id as postId, posts.creator_id, posts.front_image, users.* FROM posts INNER JOIN liked on liked.post_id=posts.id inner join users on liked.user_id=users.id where liked.user_id=$1"
+            const querySaved="SELECT posts.id as postId, posts.creator_id, posts.front_image, users.* FROM posts INNER JOIN saved on saved.post_id=posts.id inner join users on saved.user_id=users.id where saved.user_id=$1"
+            
             const liked = await this.DBClient.query(queryLiked,[userId])
             const saved = await this.DBClient.query(querySaved,[userId])
-
             const posts = {liked:liked.rows,saved:saved.rows}
-            
+          
             return posts
         }
         catch(e) {
