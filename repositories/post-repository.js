@@ -103,34 +103,48 @@ export class PostRepository {
         const offset = (page - 1) * limit;
     
         const sql = `
-            SELECT 
-                p.id AS post_id,
-                p.title,
-                p.description,
-                p.date_posted,
-                p.likes,
-                p.front_image,
-                p.back_image,
-                u.username,
-                COUNT(pt.tag_id) AS tag_count,
-                (CASE
-                    WHEN u.username LIKE $1 THEN 4
-                    WHEN p.title LIKE $1 THEN 3
-                    WHEN p.description LIKE $1 THEN 1
-                    ELSE 0
-                END) AS relevance
-            FROM posts p
-            JOIN users u ON p.creator_id = u.id
-            LEFT JOIN post_tag pt ON p.id = pt.post_id
-            WHERE 
-                u.username LIKE $1 
-                OR p.title LIKE $1 
-                OR p.description LIKE $1
-            GROUP BY p.id, u.username
-            ORDER BY relevance DESC
-            LIMIT $2 OFFSET $3
-        `;
+        SELECT 
+        p.id AS post_id,
+        json_build_object (
+            'title', p.title,
+            'description', p.description,
+            'date_posted', p.date_posted,
+            'likes', p.likes,
+            'front_image', p.front_image,
+            'back_image', p.back_image,
+            'creator_user', json_build_object (
+                'id', u.id,
+                'username', u.username,
+                'profile_photo', u.profile_photo
+            ),
+            'tags', COALESCE(json_agg(pt.tag_id) FILTER (WHERE pt.tag_id IS NOT NULL), '[]') -- Agregar los tags como un array JSON
+        ) AS post,
+        COUNT(pt.tag_id) AS tag_count,
+        (CASE
+            WHEN u.username LIKE $1 THEN 4
+            WHEN p.title LIKE $1 THEN 3
+            WHEN p.description LIKE $1 THEN 1
+            ELSE 0
+        END) AS relevance
+        FROM 
+            posts p
+        JOIN 
+            users u ON p.creator_id = u.id
+        LEFT JOIN 
+            post_tag pt ON p.id = pt.post_id
+        WHERE 
+            u.username LIKE $1 
+            OR p.title LIKE $1 
+            OR p.description LIKE $1
+        GROUP BY 
+            p.id, u.id, u.username, u.profile_photo
+        ORDER BY 
+            relevance DESC
+        LIMIT 
+            $2 OFFSET $3;
     
+        `;
+
         try {
             const result = await this.DBClient.query(sql, [searchQuery, limit, offset]);
             
