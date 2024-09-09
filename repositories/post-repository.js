@@ -98,10 +98,11 @@ export class PostRepository {
         return Pagination.BuildPagination(responses, limit, page, total_responses_comment);
 
     }
+
     async SearchPosts(query, limit, page) {
         const searchQuery = `%${query}%`;
-        const offset = (page - 1) * limit;
-    
+        const offset = (page - 1);
+        console.log("page",page)
         const sql = `
         SELECT 
         p.id AS post_id,
@@ -161,6 +162,7 @@ export class PostRepository {
             `;
             const countResult = await this.DBClient.query(countQuery, [searchQuery]);
             const total = countResult.rows[0].total;
+            console.log("total", total, "--", "page", page);
             return Pagination.BuildPagination(result.rows, limit, page, total);
         } catch (error) {
             console.error("Error fetching search results:", error);
@@ -172,6 +174,7 @@ export class PostRepository {
 
     async getAllPost(limit, page, userId){
         page=page-1;
+        
         let query = `
             SELECT
             p.id,

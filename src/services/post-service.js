@@ -16,7 +16,8 @@ async IsLiked(filters){
 
 async SearchPosts(query, limit, page){
     const results = await this.bd.SearchPosts(query, limit, page);
-    return results
+    console.log("aa",results.pagination.nextPage);
+    return results;
 }
 
     async GetCommentsPost(id, limit, page){

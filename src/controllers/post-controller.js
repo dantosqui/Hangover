@@ -1,5 +1,5 @@
 import  express from "express";
-import PostService from "../services/post-service.js"
+import PostService from "../services/post-service.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
 import { Comment } from "../entities/comment.js";
 import { CommentLikes } from "../entities/comment_likes.js";
