@@ -1,3 +1,4 @@
+
 import { DesignRepository } from "../../repositories/design-repository.js";
 
 export default class DesignService {
@@ -5,11 +6,13 @@ export default class DesignService {
         this.bd = new DesignRepository();
     }
 
-    async get(){
-
+    async get(userId, designId){
+        const response = this.bd.get(userId, designId);
+        return response;
     }
 
-    async save(){
-
+    async save(userId, designId, image){
+        const response = this.bd.save(userId, designId, image);
+        return response;
     }
 }

@@ -2,6 +2,7 @@ import express from "express";
 import cors from 'cors';
 import PostsController from './src/controllers/post-controller.js';
 import UsersController from './src/controllers/user-controller.js';
+import DesignController from "./src/controllers/design-controller.js";
 
 
 const app = express();
@@ -11,6 +12,7 @@ const port = 3508;
 
 app.use("/post", PostsController);
 app.use("/user", UsersController);
+app.use("/design", DesignController);
 
 app.listen(port, () => {
     console.log(`Server is runing on port ${port}`);
