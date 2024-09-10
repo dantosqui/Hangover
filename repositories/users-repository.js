@@ -68,10 +68,11 @@ export class UserRepository {
         try{
             const queryLiked="SELECT posts.id as postId, posts.creator_id, posts.front_image, users.* FROM posts INNER JOIN liked on liked.post_id=posts.id inner join users on liked.user_id=users.id where liked.user_id=$1"
             const querySaved="SELECT posts.id as postId, posts.creator_id, posts.front_image, users.* FROM posts INNER JOIN saved on saved.post_id=posts.id inner join users on saved.user_id=users.id where saved.user_id=$1"
-            
+            const queryBorradores="SELECT id, last_edit, id_creator_user, parent_id, image FROM designs WHERE id_creator_user = $1";
             const liked = await this.DBClient.query(queryLiked,[userId])
             const saved = await this.DBClient.query(querySaved,[userId])
-            const posts = {liked:liked.rows,saved:saved.rows}
+            const borradores = await this.DBClient.query(queryBorradores, [userId]);
+            const posts = {liked:liked.rows,saved:saved.rows, borradores:borradores.rows}
           
             return posts
         }

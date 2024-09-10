@@ -24,7 +24,7 @@ router.post("/save", AuthMiddleware, async (req, res) => {
     const desingId = req.body.designId;
     const image = req.body.image;
 
-    const saved = designService.save(user, desingId, image);
+    const saved = await designService.save(user, desingId, image);
     if(saved === false){
         return res.status(401).send();
     }else{

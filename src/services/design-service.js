@@ -7,12 +7,12 @@ export default class DesignService {
     }
 
     async get(userId, designId){
-        const response = this.bd.get(userId, designId);
+        const response = await this.bd.get(userId, designId);
         return response;
     }
 
     async save(userId, designId, image){
-        const response = this.bd.save(userId, designId, image);
+        const response = await this.bd.save(userId, designId, image);
         return response;
     }
 }

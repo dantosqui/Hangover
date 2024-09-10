@@ -86,7 +86,7 @@ router.get("/", AuthMiddleware, async (req, res) => {
 
 router.get("/library",AuthMiddleware,async (req,res) => {
     const saved = await userService.getSavedLikedPosts(req.user.id)
-    return res.status(200).json(saved)
+    return res.status(200).json(saved);
 })
 
 router.get("/profile/:id", AuthMiddleware,async (req, res) => {
