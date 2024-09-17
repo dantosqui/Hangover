@@ -64,6 +64,7 @@ export class UserRepository {
             console.log(e);
         }
     }
+    
     async getSavedLikedPosts(userId){//NO SE OBTIENE LA FOTO DE PERFIL!!!! DEL CREADOR
         try{
             const queryLiked="SELECT posts.id as postId, posts.creator_id, posts.front_image, users.* FROM posts INNER JOIN liked on liked.post_id=posts.id inner join users on liked.user_id=users.id where liked.user_id=$1"

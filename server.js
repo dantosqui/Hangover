@@ -30,24 +30,6 @@ app.use("/user", UsersController);
 app.use("/design", DesignController);
 app.use("/image", ImageController);
 
-app.get('/privateChat/:id1/:id2', AuthMiddleware, async (req, res) => {
-  console.log("Holaaa");
-  const id1 = req.params.id1;
-  const id2 = req.params.id2;
-  if (id1 != req.user.id) {
-    return res.status(401).send();
-  }
-  const users = [id1, id2];
-  console.log("hola12");
-  try {
-    res.sendFile(path.join(__dirname, 'index.html'));
-  } catch (error) {
-    console.error('Error al verificar el chat:', error);
-    res.status(500).send('Error al verificar el chat');
-  }
-});
-
-// Configura y usa el servidor de socket.io
 const io = setupSocketServer(server);
 
 const port = 3508;
