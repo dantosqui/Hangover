@@ -35,13 +35,7 @@ VALUES
 INSERT INTO comment_likes (comment_id, user_id) VALUES (1, 1), (2, 2), (3, 3);
 
 -- Insert into chats
-INSERT INTO chats (user0_id, user1_id) VALUES (1, 2), (2, 3), (3, 1);
 
--- Insert into messages
-INSERT INTO messages (content, date_sent, sender_user, chat_id) VALUES 
-('Message 1 in Chat 1', NOW(), TRUE, 1),
-('Message 2 in Chat 2', NOW(), FALSE, 2),
-('Message 3 in Chat 3', NOW(), TRUE, 3);
 
 -- Insert into designs
 INSERT INTO designs (last_edit, id_creator_user, parent_id) VALUES 
