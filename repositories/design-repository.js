@@ -9,7 +9,11 @@
         }
 
         async get(userId, designId) {
-            const sql = "SELECT image, design_data FROM designs WHERE id_creator_user = $1 AND id = $2";
+            const sql = `SELECT 
+            json_build_object (
+                'image', image,
+                'design_data', design_data
+            ) AS info FROM designs WHERE id_creator_user = $1 AND id = $2`;
             const values = [userId, designId];
             
             const design = (await this.DBClient.query(sql, values)).rows[0];

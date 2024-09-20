@@ -10,11 +10,11 @@ router.get("/get/:id", AuthMiddleware, async (req, res) => {
     const user = req.user.id;
     const designId = req.params.id;
     console.log("user",user,designId)
-    const design = designService.get(user, designId);
+    const design = await designService.get(user, designId);
     if(design === false){
         return res.status(401).send();
     }else{
-        return res.status(200).send(design);
+        return res.status(200).json(design);
     }
     
 });

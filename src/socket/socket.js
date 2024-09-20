@@ -54,6 +54,7 @@ export default function setupSocketServer(server) {
       });
 
       socket.on('load messages', async (data) => {
+        console.log("Holaaa");
         const { page, limit } = data;
         try {
           const results = await chatCtrl.loadMessages(users, page, limit);
