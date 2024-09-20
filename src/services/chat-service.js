@@ -1,3 +1,4 @@
+// src/services/chat-service.js
 import ChatRepository from '../../repositories/chat-repository.js';
 
 class ChatService {
@@ -10,9 +11,9 @@ class ChatService {
         return exists;
     }
 
-    async recoverChat(id1, id2) {
-        const chat = await this.bd.recoverChat(id1, id2);
-        return chat;
+    async loadMessages(id1, id2, page, limit) {
+        const messages = await this.bd.loadMessages(id1, id2, page, limit);
+        return messages;
     }
 
     async createMessage(id1, id2, content) {

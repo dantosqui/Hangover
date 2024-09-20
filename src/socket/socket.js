@@ -16,7 +16,6 @@ export default function setupSocketServer(server) {
   io.use((socket, next) => {
     const token = socket.handshake.query.token;
     if (token !== "") {
-      // Verifica el token
       const decoded = decryptToken(token);
       socket.user = decoded;
     } else {
@@ -39,7 +38,7 @@ export default function setupSocketServer(server) {
         return;
       }
       
-      socket.users = users; // Almacenar los usuarios en el socket
+      socket.users = users;
       await chatCtrl.checkChat(users);
       socket.emit('user connected', { userID: users[0] });
       
@@ -54,16 +53,16 @@ export default function setupSocketServer(server) {
         }
       });
 
-      if (!socket.recovered) {
+      socket.on('load messages', async (data) => {
+        const { page, limit } = data;
         try {
-          const results = await chatCtrl.recoverChat(users);
-          results.rows.forEach(row => {
-            socket.emit('chat message', row.content, row.id.toString(), row.sender_user, row.date_sent, users[0]);
-          });
-        } catch (e) {
-          console.error(e);
+          const results = await chatCtrl.loadMessages(users, page, limit);
+          socket.emit('load messages', results.rows, results.hasMore);
+        } catch (error) {
+          console.error('Error al cargar mensajes:', error);
+          socket.emit('error', { message: 'Error al cargar mensajes' });
         }
-      }
+      });
     });
   });
 

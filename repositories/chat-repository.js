@@ -1,3 +1,4 @@
+// src/repositories/chat-repository.js
 import pg from 'pg';
 import { DBConfig } from './dbconfig.js';
 
@@ -9,25 +10,20 @@ class ChatRepository {
     }
 
     async getChatId(id1, id2) {
-        console.log("iddd: ", id2)
         const query = `
             SELECT chat_id
-FROM chat_members
-WHERE user_id IN ($1, $2)
-GROUP BY chat_id
-HAVING COUNT(DISTINCT user_id) = 2
-   AND COUNT(*) = (
-       SELECT COUNT(*)
-       FROM chat_members cm2
-       WHERE cm2.chat_id = chat_members.chat_id
-   );
-
-
-
+            FROM chat_members
+            WHERE user_id IN ($1, $2)
+            GROUP BY chat_id
+            HAVING COUNT(DISTINCT user_id) = 2
+               AND COUNT(*) = (
+                   SELECT COUNT(*)
+                   FROM chat_members cm2
+                   WHERE cm2.chat_id = chat_members.chat_id
+               );
         `;
 
         const result = await this.DBClient.query(query, [id1, id2]);
-        console.log(result.rows);
         if (result.rows.length > 0) {
             return result.rows[0].chat_id;
         } else {
@@ -37,7 +33,6 @@ HAVING COUNT(DISTINCT user_id) = 2
 
     async checkChat(id1, id2) {
         let result = await this.getChatId(id1, id2);
-        console.log("resultado:", result);
         if (result === null) {
             let query = "INSERT INTO chats (name) VALUES (null) RETURNING id";
             result = await this.DBClient.query(query);
@@ -57,13 +52,29 @@ HAVING COUNT(DISTINCT user_id) = 2
         }
     }
 
-    async recoverChat(id1, id2) {
-        let result = await this.getChatId(id1, id2);
-        console.log("resultx2: ", result);
-        if (result !== null) {
-            const query = "SELECT * FROM messages WHERE chat_id = $1 AND date_sent < CURRENT_TIMESTAMP";
-            const messages = await this.DBClient.query(query, [result]);
-            return messages;
+    async loadMessages(id1, id2, page, limit) {
+        let chatId = await this.getChatId(id1, id2);
+        if (chatId !== null) {
+            const offset = (page - 1) * limit;
+            const query = `
+                SELECT * FROM messages 
+                WHERE chat_id = $1 AND date_sent < CURRENT_TIMESTAMP
+                ORDER BY date_sent DESC
+                LIMIT $2 OFFSET $3
+            `;
+            const countQuery = `
+                SELECT COUNT(*) FROM messages 
+                WHERE chat_id = $1 AND date_sent < CURRENT_TIMESTAMP
+            `;
+            
+            const messages = await this.DBClient.query(query, [chatId, limit, offset]);
+            const countResult = await this.DBClient.query(countQuery, [chatId]);
+            const totalCount = parseInt(countResult.rows[0].count);
+            
+            return {
+                rows: messages.rows.reverse(),
+                hasMore: totalCount > (page * limit)
+            };
         } else {
             throw new Error('Chat not found');
         }
