@@ -178,7 +178,23 @@ export class UserRepository {
 
     async getCarrito(id){
         const query = `
-        json_build_object(`SELECT * FROM shopping_cart WHERE user_id = $1 INNER JOIN posts ON shopping_cart.post_id = posts.id";
+                SELECT 
+                    shopping_cart.id AS cart_id,
+                    shopping_cart.user_id,
+                    shopping_cart.post_id,
+                    shopping_cart.quantity,
+                    posts.title,
+                    posts.description,
+                    posts.price,
+                    posts.front_image,
+                    posts.back_image
+                FROM 
+                    shopping_cart
+                INNER JOIN 
+                    posts ON shopping_cart.post_id = posts.id
+                WHERE 
+                    shopping_cart.user_id = $1;
+            `;
         const values = [id];
         try{
             const carrito = await this.DBClient.query(query, values);

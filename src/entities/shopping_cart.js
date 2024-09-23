@@ -1,8 +1,9 @@
 export class Shopping_Cart{
-    constructor(id, post_id, user_id, quantity) {
+    constructor(id, post_id, user_id, quantity, talle) {
         this.id = id; 
         this.post_id = post_id;
         this.user_id = user_id;
         this.quantity = quantity;
+        this.talle = talle;
     }
 }

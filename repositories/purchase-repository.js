@@ -9,8 +9,9 @@ export class PurchaseRepository {
     }
 
     async insertInShoppingCart(shopping_cart){
-        const query = "INSERT INTO shopping_cart (post_id, user_id, quantity) VALUES ($1, $2, $3)";
-        const values = [shopping_cart.postId, shopping_cart.userId, shopping_cart.quantity];
+        console.log(shopping_cart);
+        const query = "INSERT INTO shopping_cart (post_id, user_id, total_price, quantity, size) VALUES ($1, $2, $3, $4, $5)";
+        const values = [shopping_cart.idPost, shopping_cart.userId, shopping_cart.total_price, shopping_cart.quantity, shopping_cart.size];
 
         try{
             const inserted = await this.DBClient.query(query, values);
@@ -18,8 +19,7 @@ export class PurchaseRepository {
         } catch (error) {
             console.error("Error capturado:", error);
 
-            // Devolver un código de estado 500
-            res.status(500).send('Error interno del servidor');
+            // Devolver un código de estado 50
         }
         
     }

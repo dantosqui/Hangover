@@ -58,6 +58,15 @@ router.post("/register", validateUserFields, async (req,res)=>{
     
 });
 
+    router.get("/checkToken",AuthMiddleware, async (req,res)=>{
+        if(req.user){
+            return res.status(200).send("OK")
+        }
+        else{
+            return res.status(401).send("Unauthorized")
+        }
+    })
+
 const checkBirthDate = (date) => {
     const today = new Date();
     const birthDate = new Date(user.date_of_birth);

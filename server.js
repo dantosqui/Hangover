@@ -6,6 +6,7 @@ import UsersController from './src/controllers/user-controller.js';
 import DesignController from './src/controllers/design-controller.js';
 import ImageController from './src/controllers/image-controller.js';
 import PaymentController from './src/controllers/payment-controller.js';
+import PurchaseController from './src/controllers/purchase-controller.js';
 import http from 'http';
 import path from 'path';
 import url from 'url';
@@ -31,6 +32,7 @@ app.use("/user", UsersController);
 app.use("/design", DesignController);
 app.use("/image", ImageController);
 app.use("/payment", PaymentController);
+app.use("/purchase", PurchaseController);
 
 const io = setupSocketServer(server);
 

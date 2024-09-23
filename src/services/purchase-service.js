@@ -1,8 +1,8 @@
 import { PurchaseRepository } from "../../repositories/purchase-repository.js";
 
-export default class PostsService {
+export default class PurchaseService {
     constructor (){
-        this.bd = new PostRepository();
+        this.bd = new PurchaseRepository();
     }
 
     async InsertInShoppingCart(shopping_cart){
