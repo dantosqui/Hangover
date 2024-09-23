@@ -122,4 +122,14 @@ router.delete("/follow/:id",AuthMiddleware,async(req,res) => {
     return res.status(200).json(r)
 })
 
+router.get("/carrito", AuthMiddleware, async(req,res) => {
+    const user = req.user;
+    if(user !== null){
+        carrito = await userService.getCarrito(user.id);
+        return res.status(200).json(carrito);
+    }else{
+        return res.status(401).send();
+    }
+});
+
 export default router;

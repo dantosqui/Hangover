@@ -176,4 +176,17 @@ export class UserRepository {
         }
     }
 
+    async getCarrito(id){
+        const query = `
+        json_build_object(`SELECT * FROM shopping_cart WHERE user_id = $1 INNER JOIN posts ON shopping_cart.post_id = posts.id";
+        const values = [id];
+        try{
+            const carrito = await this.DBClient.query(query, values);
+            return carrito.rows;
+        }
+        catch(error){
+            console.error("error capturado: ",error);
+        }
+    }
+
 }

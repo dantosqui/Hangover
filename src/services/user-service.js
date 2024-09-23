@@ -38,6 +38,11 @@ export class UsersService{
         const inserted = await this.bd.deleteFollow(ownId,followId)
         return inserted
     }
+
+    async getCarrito(id){
+        const carrito = await this.bd.getCarrito(id);
+        return carrito;
+    }
 }
 
 

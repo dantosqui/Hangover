@@ -134,9 +134,10 @@ export class PostRepository {
         LEFT JOIN 
             post_tag pt ON p.id = pt.post_id
         WHERE 
-            u.username LIKE $1 
-            OR p.title LIKE $1 
-            OR p.description LIKE $1
+            --ilike trains 
+            u.username ILIKE $1 
+            OR p.title ILIKE $1 
+            OR p.description ILIKE $1
         GROUP BY 
             p.id, u.id, u.username, u.profile_photo
         ORDER BY 
