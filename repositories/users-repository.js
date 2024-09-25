@@ -198,7 +198,7 @@ export class UserRepository {
         const values = [id];
         try{
             const carrito = await this.DBClient.query(query, values);
-            return carrito.rows;
+            return {carritoStuff:carrito.rows}
         }
         catch(error){
             console.error("error capturado: ",error);

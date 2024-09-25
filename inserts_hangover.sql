@@ -12,11 +12,11 @@ VALUES
 ('user3', 'Jim', 'Beam', 'jim.beam@example.com', 'password3', '1994-03-03', 'Description 3', 'https://randomuser.me/api/portraits/women/2.jpg', 3);
 
 -- Insert into posts
-INSERT INTO posts (creator_id, title, description, allow_comments, visibility_id, parent_id, likes, remixable, date_posted, front_image, back_image)
+INSERT INTO posts (creator_id, title, description, allow_comments, visibility_id, parent_id, likes, remixable, date_posted, front_image, back_image, price)
 VALUES
-(1, 'Post 1', 'Description 1', TRUE, 1, NULL, 10, TRUE, NOW(), 'front1.jpg', 'back1.jpg'),
-(2, 'Post 2', 'Description 2', TRUE, 2, NULL, 20, FALSE, NOW(), 'front2.jpg', 'back2.jpg'),
-(3, 'Post 3', 'Description 3', FALSE, 3, NULL, 30, TRUE, NOW(), 'front3.jpg', 'back3.jpg');
+(1, 'Post 1', 'Description 1', TRUE, 1, NULL, 10, TRUE, NOW(), 'front1.jpg', 'back1.jpg', 250),
+(2, 'Post 2', 'Description 2', TRUE, 2, NULL, 20, FALSE, NOW(), 'front2.jpg', 'back2.jpg', 250),
+(3, 'Post 3', 'Description 3', FALSE, 3, NULL, 30, TRUE, NOW(), 'front3.jpg', 'back3.jpg', 250);
 
 -- Insert into tags
 INSERT INTO tags (name) VALUES ('tag1'), ('tag2'), ('tag3');

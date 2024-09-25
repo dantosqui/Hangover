@@ -11,7 +11,7 @@ export class PurchaseRepository {
     async insertInShoppingCart(shopping_cart){
         console.log(shopping_cart);
         const query = "INSERT INTO shopping_cart (post_id, user_id, total_price, quantity, size) VALUES ($1, $2, $3, $4, $5)";
-        const values = [shopping_cart.idPost, shopping_cart.userId, shopping_cart.total_price, shopping_cart.quantity, shopping_cart.size];
+        const values = [shopping_cart.post_id, shopping_cart.user_id, shopping_cart.total_price, shopping_cart.quantity, shopping_cart.size];
 
         try{
             const inserted = await this.DBClient.query(query, values);

@@ -134,7 +134,8 @@ router.delete("/follow/:id",AuthMiddleware,async(req,res) => {
 router.get("/carrito", AuthMiddleware, async(req,res) => {
     const user = req.user;
     if(user !== null){
-        carrito = await userService.getCarrito(user.id);
+        const carrito = await userService.getCarrito(user.id);
+        console.log(carrito);
         return res.status(200).json(carrito);
     }else{
         return res.status(401).send();
