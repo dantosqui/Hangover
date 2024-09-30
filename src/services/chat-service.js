@@ -28,6 +28,10 @@ class ChatService {
     async getChatId(userId, otherUserId){
         return await this.bd.getChatId(userId, otherUserId);
     }
+
+    async insertGroupChat(userId, name, members){
+        await this.bd.insertChatGroup(userId, name, members);
+    }
 }
 
 export default ChatService;

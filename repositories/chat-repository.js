@@ -67,7 +67,8 @@ class ChatRepository {
         if (chatId !== null) {
             const offset = (page - 1) * limit;
             const query = `
-                SELECT * FROM messages 
+                SELECT messages.*, users.username FROM messages
+                inner join users on messages.sender_user=users.id
                 WHERE chat_id = $1 AND date_sent < CURRENT_TIMESTAMP
                 ORDER BY date_sent DESC
                 LIMIT $2 OFFSET $3
@@ -81,7 +82,26 @@ class ChatRepository {
             const countResult = await this.DBClient.query(countQuery, [chatId]);
             const totalCount = parseInt(countResult.rows[0].count);
             
+            const query2 = `
+                SELECT c.name, u.username 
+                FROM chats c
+                INNER JOIN chat_members cm ON cm.chat_id = c.id
+                INNER JOIN users u ON cm.user_id = u.id
+                WHERE c.id = $1
+            `;
+            const values = [chatId];
+            const result = await this.DBClient.query(query2, values);
+            const info = {
+                chatName: null,
+                userList: []
+            };
+            if (result.rows.length > 0) {
+                info.chatName = result.rows[0].name; // Nombre del chat
+                info.userList = result.rows.map(row => row.username); // Lista de usernames
+            }
+            console.log(info);
             return {
+                info: info,
                 rows: messages.rows.reverse(),
                 hasMore: totalCount > (page * limit)
             };
@@ -133,6 +153,25 @@ class ChatRepository {
             ownId: userId,  // ID del usuario actual
             chats: result.rows // Array con los chats
         };
+    }
+
+    async insertChatGroup(userId, name, members){
+        const insertChatQuery = `INSERT INTO chats (name) VALUES ($1) returning id`;
+        const insertChatValues = [name];
+        const chatResult = await this.DBClient.query(insertChatQuery, insertChatValues);
+        const chatId = chatResult.rows[0].id; // Obtener el id del chat insertado
+
+        // Crear una lista con los valores para insertar en `chat_members`
+       
+        
+        members.push(userId)
+
+        // Insertar el creador del grupo (userId) y los demás miembros en `chat_members`
+        members.forEach(async member => {
+            const insertmember =`INSERT INTO chat_members (chat_id,user_id) VALUES ($1,$2)`
+            await this.DBClient.query(insertmember,[chatId,member])
+        });
+        
     }
 }
 

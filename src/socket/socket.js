@@ -60,7 +60,7 @@ export default function setupSocketServer(server) {
         const { page, limit } = data;
         try {
           const results = await chatService.loadMessages(chatId, page, limit);
-          socket.emit('load messages', results.rows, results.hasMore);
+          socket.emit('load messages', results.info, results.rows, results.hasMore);
         } catch (error) {
           console.error('Error al cargar mensajes:', error);
           socket.emit('error', { message: 'Error al cargar mensajes' });

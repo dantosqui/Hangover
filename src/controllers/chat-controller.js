@@ -31,4 +31,21 @@ router.get("/get/:id", AuthMiddleware, async (req, res) => {
     }
 });
 
+router.post("/create/group", AuthMiddleware, async (req, res) => {
+    try{
+        const userId = req.user.id;
+        const name = req.body.name;
+        const members = req.body.members;
+
+        await chatService.insertGroupChat(userId, name, members);
+
+        res.status(201).send();
+
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({ message: error });
+    }
+});
+
 export default router;
