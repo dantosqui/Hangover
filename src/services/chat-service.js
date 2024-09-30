@@ -6,19 +6,27 @@ class ChatService {
         this.bd = new ChatRepository();
     }
 
-    async checkChat(id1, id2) {
-        const exists = await this.bd.checkChat(id1, id2);
+    async checkChat(chatId) {
+        const exists = await this.bd.checkChat(chatId);
         return exists;
     }
 
-    async loadMessages(id1, id2, page, limit) {
-        const messages = await this.bd.loadMessages(id1, id2, page, limit);
+    async loadMessages(chatId, page, limit) {
+        const messages = await this.bd.loadMessages(chatId, page, limit);
         return messages;
     }
 
-    async createMessage(id1, id2, content) {
-        const message = await this.bd.createMessage(id1, id2, content);
+    async createMessage(userId, chatId, content) {
+        const message = await this.bd.createMessage(userId, chatId, content);
         return message;
+    }
+
+    async getRecentChats(userId) {
+        return await this.bd.getRecentChats(userId);
+    }
+
+    async getChatId(userId, otherUserId){
+        return await this.bd.getChatId(userId, otherUserId);
     }
 }
 

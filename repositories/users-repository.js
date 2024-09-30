@@ -175,7 +175,26 @@ export class UserRepository {
             console.error("error capturado: ",error)
         }
     }
-
+    async getFriends(idUser) {
+        const query = `
+            SELECT u.id, u.username
+            FROM users u
+            WHERE u.id IN (
+                SELECT followed_id
+                FROM user_relationships
+                WHERE follower_id = $1
+                AND followed_id IN (
+                    SELECT follower_id
+                    FROM user_relationships
+                    WHERE followed_id = $1
+                )
+            );
+        `;
+        const values = [idUser]
+        const result = await this.DBClient.query(query, values)
+        return result.rows
+    }
+    
     async getCarrito(id){
         const query = `
                 SELECT 

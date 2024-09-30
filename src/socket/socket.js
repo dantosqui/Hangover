@@ -1,9 +1,9 @@
 // src/socket/socket.js
 import { Server } from 'socket.io';
-import chatController from '../controllers/chat-controller.js';
+import ChatService from '../services/chat-service.js';
 import { decryptToken } from '../auth/jwt.js';
 
-const chatCtrl = new chatController();
+const chatService = new ChatService();
 
 export default function setupSocketServer(server) {
   const io = new Server(server, {
@@ -26,28 +26,30 @@ export default function setupSocketServer(server) {
 
   io.on('connection', async (socket) => {
     socket.on('set users', async (data) => {
-      let { users } = data;
+      const userId = data.users[0];
+      const chatId = data.users[1];
+      console.log(userId);
       if (socket.user === undefined) {
         socket.emit('error', { message: 'Sesion finalizada' });
         socket.disconnect();
         return;
       }
-      if (users[0] != socket.user.id) {
+      if (userId != socket.user.id) {
         socket.emit('error', { message: 'ID de usuario no válido' });
         socket.disconnect();
         return;
       }
       
-      socket.users = users;
-      await chatCtrl.checkChat(users);
-      socket.emit('user connected', { userID: users[0] });
+      socket.chatId = chatId;
+      await chatService.checkChat(userId, chatId);
+      socket.emit('user connected', { userID: userId });
       
       socket.on('chat message', async (data) => {
         const mensaje = data.mensaje;
 
         try {
-          const result = await chatCtrl.createMessage(users, mensaje);
-          io.emit('chat message', result.rows[0].content, result.rows[0].id.toString(), result.rows[0].sender_user, result.rows[0].date_sent, users[0]);
+          const result = await chatService.createMessage(userId, chatId, mensaje);
+          io.emit('chat message', result.rows[0].content, result.rows[0].id.toString(), result.rows[0].sender_user, result.rows[0].date_sent, userId);
         } catch (error) {
           console.error('Error al crear mensaje:', error);
         }
@@ -57,7 +59,7 @@ export default function setupSocketServer(server) {
         console.log("Holaaa");
         const { page, limit } = data;
         try {
-          const results = await chatCtrl.loadMessages(users, page, limit);
+          const results = await chatService.loadMessages(chatId, page, limit);
           socket.emit('load messages', results.rows, results.hasMore);
         } catch (error) {
           console.error('Error al cargar mensajes:', error);

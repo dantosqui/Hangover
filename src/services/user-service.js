@@ -43,6 +43,11 @@ export class UsersService{
         const carrito = await this.bd.getCarrito(id);
         return carrito;
     }
+    
+    async getFriends(id){
+        const withALittleHelpFromMyFriends = await this.bd.getFriends(id)
+        return withALittleHelpFromMyFriends;
+    }
 }
 
 

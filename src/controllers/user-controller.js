@@ -67,6 +67,14 @@ router.post("/register", validateUserFields, async (req,res)=>{
         }
     })
 
+    router.get("/friends",AuthMiddleware,async (req,res)=> {
+        if (req.user){
+            const result = await userService.getFriends(req.user.id)
+            return res.status(200).send(result)
+        }
+        else return res.status(401).send("unauthorisesd")
+    })
+
 const checkBirthDate = (date) => {
     const today = new Date();
     const birthDate = new Date(user.date_of_birth);

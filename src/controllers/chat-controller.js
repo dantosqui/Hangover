@@ -1,24 +1,34 @@
 // src/controllers/chat-controller.js
 import ChatService from '../services/chat-service.js';
+import express from 'express';
+import { AuthMiddleware } from '../auth/authMiddleware.js';
 
-class chatController {
-    constructor() {
-        this.chatService = new ChatService();
+const router = express.Router();
+const chatService = new ChatService();
+
+router.get("/get/chats", AuthMiddleware, async (req, res) => {
+    
+    try {
+        const userId = req.user.id; // Asumiendo que tienes autenticación y puedes acceder al ID del usuario
+        const chats = await chatService.getRecentChats(userId);
+        res.status(200).json(chats);
+    } catch (error) {
+        console.error('Error fetching recent chats:', error);
+        res.status(500).json({ message: 'Error fetching recent chats' });
     }
+});
 
-    async checkChat(users) {
-        const exists = await this.chatService.checkChat(users[0], users[1]);
+router.get("/get/:id", AuthMiddleware, async (req, res) => {
+    try{
+        const userId = req.user.id;
+        const otherUserId = req.params.id;
+        const chatId = await chatService.getChatId(userId, otherUserId);
+        res.status(200).json(chatId);
     }
-
-    async loadMessages(users, page, limit) {
-        const messages = await this.chatService.loadMessages(users[0], users[1], page, limit);
-        return messages;
+    catch(error){
+        console.error(error);
+        res.status(500).json({ message: error });
     }
+});
 
-    async createMessage(users, content) {
-        const creation = await this.chatService.createMessage(users[0], users[1], content);
-        return creation;
-    }
-}
-
-export default chatController;
+export default router;
