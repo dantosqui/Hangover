@@ -20,6 +20,11 @@ async SearchPosts(query, limit, page){
     return results;
 }
 
+async InsertPost(post){
+    const inserted = await this.bd.InsertPost(post);
+    return inserted;
+}
+
     async GetCommentsPost(id, limit, page){
         const comments = await this.bd.getCommentsPost(id,limit,page);
         return comments;

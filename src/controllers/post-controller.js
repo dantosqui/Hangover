@@ -90,6 +90,26 @@ router.get("/",AuthMiddleware,async (req, res) =>{
     }
 });     
 
+router.post("/", AuthMiddleware, async (req, res) => {
+    const post = {
+        creator_id: req.user.id,
+        title: req.body.title,
+        description: req.body.description,
+        allow_comments: req.body.allow_comments,
+        visibility: req.body.visibility,
+        parent_id:null, //TEMPORAL
+        remixable: req.body.isRemixable,
+        design_id: req.body.designId
+    };
+
+    const inserted = await postService.InsertPost(post);
+    if (inserted) {
+        return res.status(201).send();
+    } else {
+        return res.status(400).send();
+    }
+})
+
 router.post("/:id/comment", AuthMiddleware, async (req,res)=> {
     if(req.user){
         let comment = new Comment(
