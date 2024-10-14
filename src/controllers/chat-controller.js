@@ -18,6 +18,8 @@ router.get("/get/chats", AuthMiddleware, async (req, res) => {
     }
 });
 
+console.log("Holaa");
+
 router.get("/get/:id", AuthMiddleware, async (req, res) => {
     try{
         const userId = req.user.id;
