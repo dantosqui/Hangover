@@ -210,6 +210,33 @@ export class PostRepository {
         
     }
 
+    async InsertPost(post) {
+        try {
+            const query = `
+                INSERT INTO posts (creator_id, title, description, allow_comments, visibility_id, parent_id, likes, remixable, date_posted, front_image, back_image,price)
+                VALUES ($1, $2, $3, $4, (select id from visibilities where visibility = $5), $6, 0, $7,CURRENT_DATE, (select image from designs where id=$8), '',35)
+                RETURNING id;
+            `;
+            const values = [
+                post.creator_id,
+                post.title,
+                post.description,
+                post.allow_comments,
+                post.visibility,
+                post.parent_id, // Este es el valor que tienes temporalmente en null
+                post.remixable,
+                post.design_id
+            ];
+            
+            console.log(values)
+            const result = await this.DBClient.query(query, values);
+            return result.rows[0].id;  // Devuelve el ID del post insertado
+        } catch (error) {
+            console.error('Error al crear post:', error);
+            throw error;
+        }
+    }
+
     async insertComment(comment){
         const query = "INSERT INTO comments (post_id, content, date_posted, likes, parent_id, creator_id) VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4, $5)";
         const values = [comment.post_id, comment.content, comment.likes, comment.parent_id, comment.creator_id];                

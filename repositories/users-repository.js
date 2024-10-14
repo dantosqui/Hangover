@@ -73,6 +73,8 @@ export class UserRepository {
             const liked = await this.DBClient.query(queryLiked,[userId])
             const saved = await this.DBClient.query(querySaved,[userId])
             const borradores = await this.DBClient.query(queryBorradores, [userId]);
+        
+
             const posts = {liked:liked.rows,saved:saved.rows, borradores:borradores.rows}
           
             return posts
