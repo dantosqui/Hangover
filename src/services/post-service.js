@@ -82,6 +82,7 @@ async InsertPost(post){
     }
 
     async canComment(postId){
+        console.log(postId);
         const val = await this.bd.puedeComentar(postId)
         console.log("puede comentar?: " + val)
         return val;

@@ -98,7 +98,7 @@ router.post("/", AuthMiddleware, async (req, res) => {
         allow_comments: req.body.allow_comments,
         visibility: req.body.visibility,
         parent_id:null, //TEMPORAL
-        remixable: req.body.isRemixable,
+        remixable: req.body.remixable,
         design_id: req.body.designId
     };
     console.log(req.body)
