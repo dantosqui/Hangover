@@ -43,7 +43,7 @@ export class DesignRepository {
         
         const saved = await this.DBClient.query(sql, values);
         console.log(saved.rows.length > 0);  // Esto imprimirá las filas retornadas
-        return saved.rows.length > 0;
+        return saved.rows[0].id;
     }
 }
    

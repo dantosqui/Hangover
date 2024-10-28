@@ -31,7 +31,7 @@ router.post("/save", AuthMiddleware, async (req, res) => {
     if(saved === false){
         return res.status(401).send();
     }else{
-        return res.status(200).json(image);
+        return res.status(200).json(saved);
     }
     
 });
