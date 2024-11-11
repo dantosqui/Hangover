@@ -48,10 +48,16 @@ export class UsersService{
         const withALittleHelpFromMyFriends = await this.bd.getFriends(id)
         return withALittleHelpFromMyFriends;
     }
-    async updateProfile(data){
-        const todosMisAmigos = await this.bd.updateProfile(data);
+    async updateProfile(data, id) {
+    const updateResult = await this.bd.updateProfile(data, id);
+
+    if (updateResult === 1) {
         return 1;
+    } else {
+        return 0;
     }
+}
+
 }
 
 

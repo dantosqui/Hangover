@@ -125,11 +125,20 @@ router.get("/profile/:id", AuthMiddleware,async (req, res) => {
     return res.status(200).json(info);
 });
 
-router.put("/profile/simple", AuthMiddleware,async (req, res) => { //edit profile
+router.put("/profile/simple/:id", AuthMiddleware, async (req, res) => {
+    const userId = req.params.id;
     const newData = req.body;
-    const updateProfile = await userService.updateProfile(newData);
-    return res.status(200);
+
+    console.log(newData.profileImage, "aaaaaaaaa");
+    const updateProfileResult = await userService.updateProfile(newData, userId);
+
+    if (updateProfileResult === 1) {
+        return res.status(200).json({ message: "Perfil actualizado correctamente." });
+    } else {
+        return res.status(500).json({ message: "Error al actualizar el perfil." });
+    }
 });
+
 
 router.post("/follow/:id",AuthMiddleware,async (req,res) => {
     if (req.user == null){
