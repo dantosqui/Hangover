@@ -24,13 +24,14 @@ const validateUserFields = [
     body('email').isEmail(),
     body('password').isLength({ min: 6 }),
     body('date_of_birth').isDate(),
-    body('description').optional(),
-    body('profile_photo').optional(),
-    body('role_id').isInt({ min: 1 }),
+    //body('description').optional(),
+    //body('profile_photo').optional(),
+    //body('role_id').isInt({ min: 1 }),
 ];
 
 router.post("/register", validateUserFields, async (req,res)=>{
     const errors = validationResult(req);
+    console.log("errores regsiter", errors)
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array(), mensaje: "campos no son correctos" });
     }
@@ -48,7 +49,8 @@ router.post("/register", validateUserFields, async (req,res)=>{
         req.body.role_id
     );
 
-    checkBirthDate(user.date_of_birth);
+    if (!checkBirthDate(user)) 
+       { return res.status(400).send("Debe ser mayor de 13 años"); }
 
     const [success, statusCode, message] = await userService.TryRegister(user);
     return res.status(statusCode).send({
@@ -75,7 +77,7 @@ router.post("/register", validateUserFields, async (req,res)=>{
         else return res.status(401).send("unauthorisesd")
     })
 
-const checkBirthDate = (date) => {
+const checkBirthDate = (user) => {
     const today = new Date();
     const birthDate = new Date(user.date_of_birth);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -87,8 +89,9 @@ const checkBirthDate = (date) => {
     }
 
     if(age < 13){
-        return res.status(400).send("Debe ser mayor de 13 años");
+        return false
     }
+    return true
 }
 
 router.get("/", AuthMiddleware, async (req, res) => {

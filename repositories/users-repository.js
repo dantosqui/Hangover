@@ -32,24 +32,24 @@ export class UserRepository {
     async validateRegister(user){
         try {
             let query = "SELECT * FROM users WHERE username = $1";
-            let value = user.username;
+            let value = [user.username];
             let response = await this.DBClient.query(query, value);
             if(response.rows.length == 0){
                 query = "SELECT * FROM users WHERE email = $1";
-                value = user.email;
+                value = [user.email];
                 response = await this.DBClient.query(query, value);
                 if(response.rows.length === 0){
-                    query = "INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)";
-                    values = [user.first_name, user.last_name, user.username, user.password];
+                    query = "INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, role_id) VALUES ($1, $2, $3, $4, $5,$6,2)"; //id role 2 hardcodeado porque los admins los hacen los admins y los mods igual
+                    const values = [user.first_name, user.last_name, user.email, user.username, user.password,user.date_of_birth];
                     response = await this.DBClient.query(query, values);
-                    return [true, 201, ""];
+                    return [true, 201, ""]; 
                 }
                 return [false, 400, "El email ya está registrado a otra cuenta"];             
             }
             return [false, 400, "El nombre de usuarios ya existe"];
         }
         catch(e){
-            console.log(e);
+            console.log("error validadndo registro",e);
         }
     }
 
