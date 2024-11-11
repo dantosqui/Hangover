@@ -48,6 +48,7 @@ router.post("/register", validateUserFields, async (req,res)=>{
         req.body.profile_photo,
         req.body.role_id
     );
+    console.log("usuario: " + user.username)
 
     if (!checkBirthDate(user)) 
        { return res.status(400).send("Debe ser mayor de 13 años"); }
