@@ -173,41 +173,43 @@ export class PostRepository {
     
     
 
-    async getAllPost(limit, page, userId){
-        page=page-1;
-        
+    async getAllPost(limit, page, userId) {
+        page = page - 1;
+    
         let query = `
             SELECT
-            p.id,
-            json_build_object (
-                'creator_user', json_build_object (
-                    'id', u.id,
-                    'username', u.username,
-                    'profile_photo', u.profile_photo
-                ),
-                'front_image', p.front_image
-            ) AS post
+                p.id,
+                json_build_object (
+                    'creator_user', json_build_object (
+                        'id', u.id,
+                        'username', u.username,
+                        'profile_photo', u.profile_photo
+                    ),
+                    'front_image', p.front_image
+                ) AS post
             FROM 
                 posts p
             INNER JOIN 
                 users u ON p.creator_id = u.id
+            INNER JOIN
+                visibilities v ON p.visibility_id = v.id
             WHERE 
-                NOT EXISTS (
+                v.visibility = 'public'
+                AND NOT EXISTS (
                     SELECT 1 
                     FROM saved s 
                     WHERE s.user_id = $1 
                     AND s.post_id = p.id
                 )
             LIMIT $2 OFFSET $3;
-            `;
-        const collection = (await this.DBClient.query(query, [userId, limit, page*limit])).rows;
-                
-        query = "SELECT COUNT(id) AS total FROM posts";
+        `;
+    
+        const collection = (await this.DBClient.query(query, [userId, limit, page * limit])).rows;
+    
+        query = "SELECT COUNT(posts.id) AS total FROM posts inner join visibilities on posts.visibility_id=visibilities.id WHERE visibilities.visibility = 'public'"; // Adjust here as well
         const total = (await this.DBClient.query(query)).rows[0].total;
-        
-        
+    
         return Pagination.BuildPagination(collection, limit, page, total);
-        
     }
 
     async InsertPost(post) {

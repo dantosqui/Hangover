@@ -226,4 +226,16 @@ export class UserRepository {
         }
     }
 
+    async updateProfile(data){
+        const query = "update users set ";
+        const values = [];
+        try{
+            const update = await this.DBClient.query(query, values);
+            return 1
+        }
+        catch(error){
+            console.error("error capturado: ",error);
+        }
+    }
+
 }

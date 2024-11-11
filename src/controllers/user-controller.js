@@ -125,7 +125,11 @@ router.get("/profile/:id", AuthMiddleware,async (req, res) => {
     return res.status(200).json(info);
 });
 
-
+router.put("/profile/simple", AuthMiddleware,async (req, res) => { //edit profile
+    const newData = req.body;
+    const updateProfile = await userService.updateProfile(newData);
+    return res.status(200);
+});
 
 router.post("/follow/:id",AuthMiddleware,async (req,res) => {
     if (req.user == null){
